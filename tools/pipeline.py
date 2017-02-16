@@ -1,3 +1,5 @@
+from submission import labels_to_csv
+
 # Data loading
 X_train = load_images(type="train")  # TODO code load_images
 Y_labels_train = load_labels()  # TODO code load_labels
@@ -54,5 +56,4 @@ Y_labels_eval = np.argmax(Y_eval, axis=1)
 
 
 # Submission
-df_labels = pd.from_matrix(Y_labels_eval)  # TODO check syntax
-pd.save_to_csv(df_labels, filename="Yte.csv")  # TODO check syntax
+labels_to_csv(Y_labels_eval)
