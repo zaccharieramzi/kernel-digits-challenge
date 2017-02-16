@@ -1,4 +1,5 @@
 from submission import labels_to_csv
+from kernels import kernel_matrix
 
 # Data loading
 X_train = load_images(type="train")  # TODO code load_images
