@@ -23,7 +23,7 @@ Y_sample = Y_train[idx, :]
 
 # Training
 kernel_type = "linear"
-K_sample = kernel_matrix(X_train, type=kernel_type, **kwargs)  # TODO code kernel_matrix
+K_sample = kernel_matrix(X_sample, type=kernel_type, **kwargs)
 
 classifier_type = "linear regression"
 alpha = np.zeros(X_train.shape)
