@@ -4,7 +4,7 @@ import os
 import numpy as np
 import PIL.Image as Img
 
-from data_loading import load_labels, load_images
+from .data_loading import load_labels, load_images
 
 
 def dump_as_png(type='test', number=None):
@@ -15,8 +15,8 @@ def dump_as_png(type='test', number=None):
            - number (int): number of dumped images
     '''
     if type not in ["train", "test"]:
-        print("Type Error : argument should be either 'train' or 'test'")
-        return
+        raise ValueError("type {} unknown, it should be either"
+                         "'train' or 'test'".format(type))
 
     X = load_images(type=type)
     # for training images we also load the labels for naming puproses

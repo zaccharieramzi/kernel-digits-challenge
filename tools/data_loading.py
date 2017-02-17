@@ -3,9 +3,9 @@ import numpy as np
 
 def load_labels():
     '''
-    load labels as a nd array ou unsigned int of 8 bits
+    load labels as a nd array of unsigned int of 8 bits
     '''
-    Y = np.loadtxt("../data/Ytr.csv",
+    Y = np.loadtxt("data/Ytr.csv",
                    skiprows=1, usecols=(1,), delimiter=',').astype('uint8')
     return Y
 
@@ -31,18 +31,18 @@ def load_images(type="train"):
            - X ndarray (5000,3072)
     '''
     if type == "train":
-        path = '../data/Xtr.csv'
+        path = 'data/Xtr.csv'
     elif type == "test":
-        path = '../data/Xte.csv'
+        path = 'data/Xte.csv'
     else:
-        print("Type Error : argument should be either 'train' or 'test'")
-        return
+        raise ValueError("type {} unknown, it should be either"
+                         "'train' or 'test'".format(type))
 
-    f = open(path)
-    lines = f.readlines()
-    X = np.empty((len(lines), 3072), dtype=np.float32)
+    with open(path) as f:
+        lines = f.readlines()
+        X = np.empty((len(lines), 3072), dtype=np.float32)
 
-    for i, line in enumerate(lines):
-        X[i] = np.fromstring(line[:line.index(',\n')], dtype=np.float32,
-                             sep=",")
-    return X
+        for i, line in enumerate(lines):
+            X[i] = np.fromstring(line[:line.index(',\n')], dtype=np.float32,
+                                 sep=",")
+        return X
