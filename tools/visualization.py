@@ -3,6 +3,7 @@ import os
 
 import numpy as np
 import PIL.Image as Img
+import matplotlib.pyplot as plt
 
 from .data_loading import load_labels, load_images
 
@@ -60,7 +61,32 @@ def dump_as_png(type='test', number=None):
         Img.fromarray(X[i]).save(filename)
 
 
-def reshape_as_images(X):
+def imshow(x):
+    '''
+    Visualize a single vector using matplotlib
+    Args :
+        - x nd array (3072) input vector
+    '''
+    img_len = x.shape[0]
+    img_size = int(sqrt(img_len // 3))
+
+    img = np.empty((img_size, img_size, 3))
+    for c in range(3):
+        img[:, :, c] = x[1024 * c:1024 * (c + 1)].reshape(
+            (img_size, img_size))
+
+    # rescaling per channel
+    img = img - img.min(axis=(0, 1))[None, None, :]
+    img = img / img.max(axis=(0, 1))[None, None, :]
+
+    # # format as 8 bit
+    # img *= 255
+    # img = img.astype(np.uint8)
+
+    plt.imshow(img, interpolation='nearest')
+    plt.show()
+
+def reshape_as_images(x):
     '''
     Reshape the data as a vector of images
     '''
