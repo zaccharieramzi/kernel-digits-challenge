@@ -39,8 +39,8 @@ K_sample = kernel_matrix(X_sample, kernel_type=kernel_type, **kwargs)
 classifier_type = "linear regression"
 alpha = np.zeros(X_train.shape)
 for dig in range(n_classes):
-    alpha[dig, :] = find_f(K_sample, Y_sample[:, dig], prob_type=classifier_type, **kwargs)
-    # TODO code find_f
+    alpha[dig, :] = find_f(K_sample, Y_sample[:, dig],
+                           prob_type=classifier_type, **kwargs)
 
 # Evaluation
 Y_pred = np.zeros((X_test.shape[0], n_classes))
