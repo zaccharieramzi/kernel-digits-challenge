@@ -1,14 +1,24 @@
+import numpy as np
+
 from submission import labels_to_csv
 from kernels import kernel_matrix
+from data_loading import load_images, load_labels, dummy_code
+
+from visualization import imshow, dump_as_png
 
 # Data loading
-X_train = load_images(type="train")  # TODO code load_images
-Y_labels_train = load_labels()  # TODO code load_labels
-Y_train = dummy_code(Y_labels_train)  # TODO code dummy_code
-n_classes = Y_train.shape[1]  # TODO check correctness of order
+X_train = load_images(type="train")
+Y_labels_train = load_labels()
+Y_train = dummy_code(Y_labels_train)
+n_classes = Y_train.shape[1]
 
-# TODO data exploration:
+# data exploration:
 # - find a way to visualize images
+# # matplotlib style :
+# imshow(X_train[0])
+# imshow(X_train[2])
+# # png file dump
+# dump_as_png(type="train")
 # - check balance of classes
 
 # Data processing
