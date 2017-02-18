@@ -31,6 +31,7 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
     K = np.zeros((n_data, n_data))
     for i in range(n_data):
         for j in range(i+1):
-            K[i, j] = kernel(X[i, :], X[j, :], kernel_type=kernel_type, **kwargs)
+            K[i, j] = kernel(X[i, :], X[j, :],
+                             kernel_type=kernel_type, **kwargs)
             K[j, i] = K[i, j]
     return K
