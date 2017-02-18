@@ -24,12 +24,12 @@ Y_sample = Y_train[idx, :]
 
 # Training
 kernel_type = "linear"
-K_sample = kernel_matrix(X_sample, type=kernel_type, **kwargs)
+K_sample = kernel_matrix(X_sample, kernel_type=kernel_type, **kwargs)
 
 classifier_type = "linear regression"
 alpha = np.zeros(X_train.shape)
 for dig in range(n_classes):
-    alpha[dig, :] = find_f(K_sample, Y_sample[:, dig], type=classifier_type, **kwargs)
+    alpha[dig, :] = find_f(K_sample, Y_sample[:, dig], prob_type=classifier_type, **kwargs)
     # TODO code find_f
 
 # Evaluation
