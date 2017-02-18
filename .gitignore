@@ -93,3 +93,7 @@ data/
 
 # Submissions
 submissions/
+
+# images dump
+test_images/
+train_images/
