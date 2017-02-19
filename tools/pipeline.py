@@ -1,5 +1,5 @@
-from submission import labels_to_csv
-from kernels import kernel_matrix
+from tools.submission import labels_to_csv
+from tools.kernels import kernel_matrix
 
 # Data loading
 X_train = load_images(type="train")  # TODO code load_images
@@ -35,11 +35,11 @@ for dig in range(n_classes):
 # Evaluation
 Y_pred = np.zeros((X_test.shape[0], n_classes))
 for dig in range(n_classes):
-    Y_pred[:, dig] = pred(X_test, alpha[dig, :], type=kernel_type, **kwargs)
-    # TODO code pred
+    Y_pred[:, dig] = pred(X_sample, X_test, alpha[dig, :],
+                          kernel_type=kernel_type, **kwargs)
 
 
-Y_labels_pred = np.argmax(Y_pred, axis=1)  # TODO check axis
+Y_labels_pred = np.argmax(Y_pred, axis=1)
 prec = np.mean(Y_labels_pred == Y_labels_train[~idx, :])
 
 # Prediction
@@ -50,7 +50,8 @@ X_eval = process_image(X_eval)
 
 Y_eval = np.zeros((n_eval, n_classes))
 for dig in range(n_classes):
-    Y_eval[:, dig] = pred(X_eval, alpha[dig, :], type=kernel_type, **kwargs)
+    Y_eval[:, dig] = pred(X_sample, X_eval, alpha[dig, :],
+                          kernel_type=kernel_type, **kwargs)
 
 
 Y_labels_eval = np.argmax(Y_eval, axis=1)
