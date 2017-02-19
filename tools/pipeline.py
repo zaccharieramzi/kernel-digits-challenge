@@ -1,3 +1,5 @@
+import numpy as np
+
 from tools.submission import labels_to_csv
 from tools.kernels import kernel_matrix
 
@@ -16,10 +18,11 @@ X_train = process_images(X_train)  # TODO find correct image processing and code
 n_train, n_var = X_train.shape  # TODO check correctness of order
 
 # Data separation
-idx = np.random.choice(n_train, int(0.9*n_train))  # TODO check syntax
-X_sample = X_train[idx, :]
-X_test = X_train[~idx, :]  # TODO check syntax
-Y_sample = Y_train[idx, :]
+indices = np.random.permutation(x.shape[0])
+training_idx, test_idx = indices[:int(0.9*n_train)], indices[int(0.9*n_train):]
+X_sample = X_train[training_idx, :]
+X_test = X_train[test_idx, :]
+Y_sample = Y_train[training_idx, :]
 
 
 # Training
@@ -40,7 +43,7 @@ for dig in range(n_classes):
 
 
 Y_labels_pred = np.argmax(Y_pred, axis=1)
-prec = np.mean(Y_labels_pred == Y_labels_train[~idx, :])
+prec = np.mean(Y_labels_pred == Y_labels_train[test_idx, :])
 
 # Prediction
 X_eval = load_images(type="test")
