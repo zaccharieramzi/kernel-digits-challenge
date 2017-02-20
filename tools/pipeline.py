@@ -30,7 +30,9 @@ n_train, n_var = X_train.shape
 indices = np.random.permutation(X_train.shape[0])
 training_idx, test_idx = indices[:int(0.9*n_train)], indices[int(0.9*n_train):]
 X_sample = X_train[training_idx, :]
+n_sample = X_sample.shape[0]
 X_test = X_train[test_idx, :]
+n_test = X_test.shape[0]
 Y_sample = Y_train[training_idx, :]
 
 
@@ -39,7 +41,7 @@ kernel_type = "linear"
 K_sample = kernel_matrix(X_sample, kernel_type=kernel_type)
 
 classifier_type = "linear regression"
-alpha = np.zeros(X_train.shape)
+alpha = np.zeros((n_classes, n_sample))
 for dig in range(n_classes):
     alpha[dig, :] = find_f(K_sample, Y_sample[:, dig],
                            prob_type=classifier_type, lamb=1.0)
