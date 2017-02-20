@@ -1,3 +1,5 @@
+from .corner_response_function import compute_gaussian_grad, compute_corner_response
+
 image_list = select_channel(X_train, channel=0)
 window_size = 4
 stride = 2
