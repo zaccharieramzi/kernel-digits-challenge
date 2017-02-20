@@ -4,6 +4,8 @@ from tools.data_loading import load_images, load_labels, dummy_code
 from tools.visualization import imshow, dump_as_png
 from tools.submission import labels_to_csv
 from tools.kernels import kernel_matrix
+from tools.process_images import process_images
+from tools.optimization import find_f
 
 # Data loading
 X_train = load_images(type="train")
@@ -34,19 +36,19 @@ Y_sample = Y_train[training_idx, :]
 
 # Training
 kernel_type = "linear"
-K_sample = kernel_matrix(X_sample, kernel_type=kernel_type, **kwargs)
+K_sample = kernel_matrix(X_sample, kernel_type=kernel_type)
 
 classifier_type = "linear regression"
 alpha = np.zeros(X_train.shape)
 for dig in range(n_classes):
     alpha[dig, :] = find_f(K_sample, Y_sample[:, dig],
-                           prob_type=classifier_type, **kwargs)
+                           prob_type=classifier_type, lamb=1.0)
 
 # Evaluation
 Y_pred = np.zeros((X_test.shape[0], n_classes))
 for dig in range(n_classes):
     Y_pred[:, dig] = pred(X_sample, X_test, alpha[dig, :],
-                          kernel_type=kernel_type, **kwargs)
+                          kernel_type=kernel_type)
 
 
 Y_labels_pred = np.argmax(Y_pred, axis=1)
@@ -61,7 +63,7 @@ X_eval = process_image(X_eval)
 Y_eval = np.zeros((n_eval, n_classes))
 for dig in range(n_classes):
     Y_eval[:, dig] = pred(X_sample, X_eval, alpha[dig, :],
-                          kernel_type=kernel_type, **kwargs)
+                          kernel_type=kernel_type)
 
 
 Y_labels_eval = np.argmax(Y_eval, axis=1)
