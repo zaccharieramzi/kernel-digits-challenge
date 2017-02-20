@@ -6,6 +6,7 @@ from tools.submission import labels_to_csv
 from tools.kernels import kernel_matrix
 from tools.process_images import process_images
 from tools.optimization import find_f
+from tools.prediction import pred
 
 # Data loading
 X_train = load_images(type="train")
@@ -54,13 +55,13 @@ for dig in range(n_classes):
 
 
 Y_labels_pred = np.argmax(Y_pred, axis=1)
-prec = np.mean(Y_labels_pred == Y_labels_train[test_idx, :])
+prec = np.mean(Y_labels_pred == Y_labels_train[test_idx])
 
 # Prediction
 X_eval = load_images(type="test")
 n_eval = X_eval.shape[0]
 
-X_eval = process_image(X_eval)
+X_eval = process_images(X_eval)
 
 Y_eval = np.zeros((n_eval, n_classes))
 for dig in range(n_classes):
