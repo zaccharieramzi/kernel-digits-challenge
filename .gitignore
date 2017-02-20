@@ -90,3 +90,6 @@ ENV/
 
 # Data
 data/
+
+# Mac settings
+.DS_Store
