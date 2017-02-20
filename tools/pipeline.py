@@ -21,8 +21,8 @@ n_classes = Y_train.shape[1]
 # - check balance of classes
 
 # Data processing
-X_train = process_images(X_train)  # TODO find correct image processing and code it
-n_train, n_var = X_train.shape  # TODO check correctness of order
+X_train = process_images(X_train)
+n_train, n_var = X_train.shape
 
 # Data separation
 indices = np.random.permutation(X_train.shape[0])
