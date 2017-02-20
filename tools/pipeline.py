@@ -18,7 +18,7 @@ X_train = process_images(X_train)  # TODO find correct image processing and code
 n_train, n_var = X_train.shape  # TODO check correctness of order
 
 # Data separation
-indices = np.random.permutation(x.shape[0])
+indices = np.random.permutation(X_train.shape[0])
 training_idx, test_idx = indices[:int(0.9*n_train)], indices[int(0.9*n_train):]
 X_sample = X_train[training_idx, :]
 X_test = X_train[test_idx, :]
