@@ -61,7 +61,7 @@ def dump_as_png(type='test', number=None):
         Img.fromarray(X[i]).save(filename)
 
 
-def imshow(x):
+def imshow(x, points_of_interest=None):
     '''
     Visualize a single vector using matplotlib
     Args :
@@ -84,9 +84,13 @@ def imshow(x):
     # img = img.astype(np.uint8)
 
     plt.imshow(img, interpolation='nearest')
+    if points_of_interest:
+        x, y = points_of_interest
+        plt.scatter(x, y)
     plt.show()
 
-def reshape_as_images(x):
+
+def reshape_as_images(X):
     '''
     Reshape the data as a vector of images
     '''
