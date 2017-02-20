@@ -1,6 +1,25 @@
 import numpy as np
 
 
+def compute_corner_response(I_x, I_y):
+    '''
+    args :
+        - I_x ndarray gradient with regard to x
+        - I_y ndarray gradient with regard to y
+    return
+        - R float corner Response for the window
+    '''
+    M = np.empty((2, 2))
+    M[0, 0] = np.square(I_x).sum()
+    M[0, 1] = np.sum(I_x * I_y)
+    M[1, 0] = M[0, 1]
+    M[1, 1] = np.square(I_y).sum()
+
+    R = M[0, 0] * M[1, 1] - M[1, 0] * M[0, 1] - 0.05 * (M[0, 0] + M[1, 1])
+
+    return R
+
+
 def gaussian_filter_2d(shape=(3, 3), sigma=0.5):
     """
     2D gaussian mask - should give the same result as MATLAB's
@@ -64,12 +83,4 @@ def compute_gaussian_grad(image_mat):
             image_grad_y[i, j] = np.sum(
                 image_mat[rmin:rmax, smin:smax] * filtery[rmin_f:rmax_f,
                                                           smin_f:smax_f])
-    return image_grad_x, image_grad_y
-
-
-
-
-
-
-
     return image_grad_x, image_grad_y

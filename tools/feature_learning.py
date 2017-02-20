@@ -1,12 +1,16 @@
 from .corner_response_function import compute_gaussian_grad, compute_corner_response
+from .visualization import reshape_as_images
+from .data_loading import load_images
 
-image_list = select_channel(X_train, channel=0)
+image_list = load_images(type="train")
+image_list = reshape_as_images(image_list)
+image_list = image_list.mean(axis=3)
 window_size = 4
 stride = 2
 patch_size = 5
 pins = list()
-for image in image_list:
-    image_mat = image.reshape  # image viewed as a matrix and no longer a vector
+for i in range(image_list.shape[0]):
+    image = image_list[i]
     im_size = image_mat.shape[0]  # normally 32
     image_grad_x, image_grad_y = compute_gaussian_grad(image_mat)
 
@@ -14,8 +18,8 @@ for image in image_list:
     R = np.zeros((R_size, R_size))
     for i in range(R_size):
         for j in range(R_size):
-            I_x = image_grad_x[]
-            I_y = image_grad_y[]
+            I_x = image_grad_x[i*stride:i*stride+window_size]
+            I_y = image_grad_y[j*stride:j*stride+window_size]
             R[i, j] = compute_corner_response(I_x, I_y)
     # thresholding of R
     threshold = 1
