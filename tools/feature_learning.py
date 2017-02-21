@@ -17,7 +17,7 @@ def feature_learning():
     patch_size = 5
     pins = list()
 
-    R_size = (image_grad_x.shape[0] - window_size)//stride + 1
+    R_size = (image_list.shape[1] - window_size - FILTER_SIZE)//stride + 1
     R = np.zeros((image_list.shape[0], R_size, R_size))
 
     for ind in range(image_list.shape[0]):
@@ -43,7 +43,7 @@ def feature_learning():
             heatmap = R_to_heatmap(R[ind], window_size, stride, im_size)
             imshow(image_list[ind], points_of_interest=(y, x), heatmap=heatmap)
             continue
-    np.savetxt("R"+str(time.time())+".txt", R)
+    np.savetxt("R"+str(time.time())+".txt", R.reshape((image_list.shape[0], R_size**2)))
 
     for ind in range(image_list.shape[0]):
         threshold = 1
