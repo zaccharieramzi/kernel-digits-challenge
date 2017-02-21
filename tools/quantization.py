@@ -21,11 +21,11 @@ def kmeans(X, k):
         # Assignment
         Y_new = np.zeros(n)
         for i in range(n):
-            Y_new[i] = np.argmax(centroids - X[i, :])
+            Y_new[i] = np.argmin(np.linalg.norm(centroids - X[i, :], axis=1))
         # Recomputation of centroids
         new_centroids = np.zeros(centroids.shape)
         for j in range(k):
-            new_centroids[j, :] = np.mean(X[Y_new == j, :])
+            new_centroids[j, :] = np.mean(X[Y_new == j, :], axis=0)
         # Difference
         diff = np.sum(Y_new != Y)
         centroids = new_centroids
