@@ -1,7 +1,8 @@
 import numpy as np
 import time
 
-from .corner_response_function import compute_gaussian_grad, compute_corner_response
+from .corner_response_function import compute_gaussian_grad,\
+                                                compute_corner_respons
 from .visualization import reshape_as_images, imshow
 from .data_loading import load_images
 
@@ -43,20 +44,21 @@ def feature_learning():
             heatmap = R_to_heatmap(R[ind], window_size, stride, im_size)
             imshow(image_list[ind], points_of_interest=(y, x), heatmap=heatmap)
             continue
-    np.savetxt("R"+str(time.time())+".txt", R.reshape((image_list.shape[0], R_size**2)))
+    np.savetxt("R"+str(time.time())+".txt", R.reshape((image_list.shape[0],
+                                                       R_size**2)))
 
     for ind in range(image_list.shape[0]):
-        threshold = 1
-        R = R > threshold
-        # data viz / number of point of interest
-        # ex : R > np.percentile(R, 90) -> top 10%
-
-        for x_r, y_r in np.where(R[ind]):  # r_pin are the coordinates in R of point of interest
-            im_pin = from_R_to_im(r_pin, window_size, stride, im_size)
-            patch_x = image_grad_x
-            patch_y = image_grad_y
-            angles = compute_orientation(patch_x, patch_y)
-            pin = discretize_orientation(angles)
+        x, y = np.where(
+            R[ind] > np.percentile(R[ind], 75))
+        x, y = from_R_to_im(x, y, window_size, stride)
+        zipped = zip(x, y)
+        for x, y in zipped:  # r_pin are the coordinates in R of POI
+            patch_x = image_grad_x[x-patch_size:x+patch_size,
+                                   y-patch_size:y+patch_size]
+            patch_y = image_grad_y[x-patch_size:x+patch_size,
+                                   y-patch_size:y+patch_size]
+            pin_as_matrix = discretize_orientation(patch_x, patch_y)
+            pin = pin_as_vect(pin_as_matrix)
             pins.append(pin)
 
     # KMEANS
