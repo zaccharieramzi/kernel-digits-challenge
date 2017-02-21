@@ -33,19 +33,18 @@ def kmeans(X, k):
     return centroids
 
 
-def vf_vector(X, centroids):
-    '''Assigns each row of X (points of interest for one image) to the closest
-    centroid (VF).
+def vf_vector(pins, centroids):
+    '''Assigns each element of pins (points of interest for one image) to the
+    closest centroid (VF).
         Args:
-            - X (ndarray): the points of interest
+            - pins (list): the points of interest
             - centroids (ndarray): the visual features
         Output:
             - ndarray: the visual features vector
     '''
     k = centroids.shape[0]
-    n = X.shape[0]
     vf_vector = np.zeros(k)
-    for i in range(n):
-        y = np.argmin(np.linalg.norm(centroids - X[i, :], axis=1))
+    for pin in pins:
+        y = np.argmin(np.linalg.norm(centroids - pin, axis=1))
         vf_vector[y] += 1
     return vf_vector
