@@ -42,7 +42,7 @@ def feature_learning():
             x, y = from_R_to_im(x, y, window_size, stride)
 
             heatmap = R_to_heatmap(R[ind], window_size, stride, im_size)
-            imshow(image_list[ind], points_of_interest=(y, x), heatmap=heatmap)
+            imshow(image_list[ind], points_of_interest=(x, y), heatmap=heatmap)
             continue
     np.savetxt("R"+str(time.time())+".txt", R.reshape((image_list.shape[0],
                                                        R_size**2)))

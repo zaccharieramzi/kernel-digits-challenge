@@ -10,13 +10,8 @@ def discretize_orientation(patch_x, patch_y):
         - discrete_or: an array containing the orientation discretized between
         0 and 15*pi/8
     '''
-    a = np.arctan2(patch_y, patch_x)/(2*np.pi)
-    a = np.round(a*8)/8*(2*np.pi)
-    rounded_patch_x = np.cos(a)
-    rounded_patch_y = np.sin(a)
-    # round in 0-15
-    discrete_or = np.round(np.arctan2(rounded_patch_y,
-                                      rounded_patch_x)*8/np.pi)
+    orientation = np.arctan2(patch_y, patch_x)
+    discrete_or = np.round(8*orientation / np.pi)
     return discrete_or
 
 
@@ -31,5 +26,9 @@ def pin_as_vect(discrete_or):
     vect = np.zeros(16)
     for row in discrete_or:
         for el in row:
-            vect[el] += 1
+            if el >= 0:
+                idx = int(el)
+            else:
+                idx = 16 + int(el)
+            vect[idx] += 1
     return vect

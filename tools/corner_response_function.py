@@ -78,7 +78,7 @@ def compute_gaussian_grad(image_mat):
         for j in range(image_mat.shape[1]):
             # x-axis indices for image
             rmin = max(0, i - FILTERX.shape[0] // 2)
-            rmax = min(image_mat.shape[0], i + FILTERX.shape[0] // 2)
+            rmax = min(image_mat.shape[0], i + 1 + FILTERX.shape[0] // 2)
             # x-axis indices for filter
             rmin_f = rmin - i + FILTERX.shape[0] // 2
             rmax_f = rmax - i + FILTERX.shape[0] // 2
@@ -87,7 +87,7 @@ def compute_gaussian_grad(image_mat):
 
             # y-axis indices for image
             smin = max(0, j - FILTERX.shape[1] // 2)
-            smax = min(image_mat.shape[1], j + FILTERX.shape[1] // 2)
+            smax = min(image_mat.shape[1], j + 1 + FILTERX.shape[1] // 2)
             # y-axis indices for filter
             smin_f = smin - j + FILTERX.shape[1] // 2
             smax_f = smax - j + FILTERX.shape[1] // 2
