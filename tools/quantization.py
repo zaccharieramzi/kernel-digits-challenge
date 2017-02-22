@@ -30,7 +30,7 @@ def kmeans(X, k):
     diff = math.inf
     while diff > 0:
         # Assignment
-        Y_new = np.argmin(np.linalg.norm(X[:, None, :] - centr, axis=2),
+        Y_new = np.argmin(np.linalg.norm(X[:, None, :] - centroids, axis=2),
                           axis=1)
         # Recomputation of centroids
         new_centroids = np.zeros(centroids.shape)
@@ -55,7 +55,9 @@ def vf_vector(pins, centroids):
     '''
     k = centroids.shape[0]
     vf_vector = np.zeros(k)
-    for pin in pins:
-        y = np.argmin(np.linalg.norm(centroids - pin, axis=1))
-        vf_vector[y] += 1
+    pins = np.vstack(pins)
+
+    y = np.argmin(np.linalg.norm(pins[:, None, :] - centroids, axis=2), axis=1)
+    for j in range(k):
+        vf_vector[j] = (y == j).sum()
     return vf_vector
