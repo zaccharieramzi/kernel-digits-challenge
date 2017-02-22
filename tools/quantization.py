@@ -30,9 +30,8 @@ def kmeans(X, k):
     diff = math.inf
     while diff > 0:
         # Assignment
-        Y_new = np.zeros(n)
-        for i in range(n):
-            Y_new[i] = np.argmin(np.linalg.norm(centroids - X[i, :], axis=1))
+        Y_new = np.argmin(np.linalg.norm(X[:, None, :] - centr, axis=2),
+                          axis=1)
         # Recomputation of centroids
         new_centroids = np.zeros(centroids.shape)
         for j in range(k):
