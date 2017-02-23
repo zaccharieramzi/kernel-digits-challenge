@@ -9,7 +9,7 @@ from .visualization import reshape_as_images, imshow
 
 
 def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
-                    filter_size=3, ratio_pins_per_image=25, data_type="train"
+                    filter_size=3, ratio_pins_per_image=25, data_type="train",
                     index_to_visualize=[]):
     # data loading
     X = load_images(type=data_type)
