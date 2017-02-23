@@ -40,24 +40,29 @@ def kmeans(X, k):
         diff = np.sum(Y_new != Y)
         centroids = new_centroids
         Y = Y_new
-        print(diff)
+        print("Wrongly clusterized pins: {}".format(diff))
     return centroids
 
 
-def vf_vector(pins, centroids):
+def vf_vector(pins, centroids, pin_to_im, n):
     '''Assigns each element of pins (points of interest for one image) to the
     closest centroid (VF).
         Args:
             - pins (list): the points of interest
             - centroids (ndarray): the visual features
+            - pin_to_im (dict): the maps from a particular pin to the image
+            it belongs to.
+            - n (int): the number of images.
         Output:
             - ndarray: the visual features vector
     '''
     k = centroids.shape[0]
-    vf_vector = np.zeros(k)
+    vf_vector = np.zeros((n, k))
     pins = np.vstack(pins)
 
     y = np.argmin(np.linalg.norm(pins[:, None, :] - centroids, axis=2), axis=1)
-    for j in range(k):
-        vf_vector[j] = (y == j).sum()
+
+    for idx, pin in enumerate(pins):
+        y_pin = y[idx]
+        vf_vector[pin_to_im[idx], y_pin] += 1
     return vf_vector

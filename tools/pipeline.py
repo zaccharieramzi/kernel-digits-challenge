@@ -1,18 +1,23 @@
 import numpy as np
 
-from tools.data_loading import load_images, load_labels, dummy_code
-from tools.visualization import imshow, dump_as_png
-from tools.submission import labels_to_csv
-from tools.kernels import kernel_matrix
-from tools.process_images import process_images
-from tools.optimization import find_f
-from tools.prediction import pred
+from .data_loading import load_images, load_labels, dummy_code
+from .kernels import kernel_matrix
+from .optimization import find_f
+from .prediction import pred
+from .process_images import process_images
+from .quantization import kmeans
+from .submission import labels_to_csv
+from .visualization import imshow, dump_as_png
 
 # Data loading
 X_train = load_images(type="train")
+n_train = X_train.shape[0]
 Y_labels_train = load_labels()
 Y_train = dummy_code(Y_labels_train)
 n_classes = Y_train.shape[1]
+
+indices = np.random.permutation(X_train.shape[0])
+training_idx, test_idx = indices[:int(0.9*n_train)], indices[int(0.9*n_train):]
 
 # data exploration:
 # - find a way to visualize images
@@ -23,13 +28,20 @@ n_classes = Y_train.shape[1]
 # dump_as_png(type="train")
 # - check balance of classes
 
+# Visual features
+pins_dict_train = pins_generation(training_idx=training_idx)
+pins_train = pins_dict_train["pins"]
+train_pins = pins_dict_train["train_pins"]
+pin_to_im_train = pins_dict_train["pin_to_im"]
+pins_mat = np.vstack(train_pins)
+visual_features = kmeans(pins_mat, 70)
+
 # Data processing
-X_train = process_images(X_train)
+X_train = process_images(n_train, visual_features, pins_train, pin_to_im_train)
 n_train, n_var = X_train.shape
 
 # Data separation
-indices = np.random.permutation(X_train.shape[0])
-training_idx, test_idx = indices[:int(0.9*n_train)], indices[int(0.9*n_train):]
+
 X_sample = X_train[training_idx, :]
 n_sample = X_sample.shape[0]
 X_test = X_train[test_idx, :]
@@ -56,12 +68,21 @@ for dig in range(n_classes):
 
 Y_labels_pred = np.argmax(Y_pred, axis=1)
 prec = np.mean(Y_labels_pred == Y_labels_train[test_idx])
+print("The precision on the test set is of {}".format(prec))
 
 # Prediction
 X_eval = load_images(type="test")
 n_eval = X_eval.shape[0]
 
-X_eval = process_images(X_eval)
+# Visual features for submission
+pins_dict_eval = pins_generation(data_type="test")
+pins_eval = pins_dict_eval["pins"]
+pin_to_im_eval = pins_dict_eval["pin_to_im"]
+
+
+# Data processing
+X_eval = process_images(n_eval, visual_features, pins_eval, pin_to_im_eval)
+n_eval, n_var = X_eval.shape
 
 Y_eval = np.zeros((n_eval, n_classes))
 for dig in range(n_classes):
