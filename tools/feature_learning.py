@@ -61,8 +61,8 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
     pin_to_im = dict()
     # In this loop, we retrieve the gradient patch associated with each point
     # that we identified as interesting. We then discretize and vectorize it.
-    for image_idx in range(images.shape[0]):
-        image_mat = images[image_idx]
+    for image_idx in range(n_images):
+        image_mat = image_list[image_idx]
         i_s, j_s = np.where(
             R[image_idx] > np.percentile(R[image_idx],
                                          100 - ratio_pins_per_image))
