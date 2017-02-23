@@ -45,8 +45,7 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
             i, j = np.where(
                 R[image_index] > np.percentile(R[image_index],
                                                100 - ratio_pins_per_image))
-            i, j = from_R_to_im(x, y, window_size, stride,
-                                filter_size=filter_size)
+            i, j = from_R_to_im(x, y, window_size, stride, filter_size)
 
             x, y = j, i
 
@@ -66,7 +65,7 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
         i_s, j_s = np.where(
             R[image_idx] > np.percentile(R[image_idx],
                                          100 - ratio_pins_per_image))
-        i_s, j_s = from_R_to_im(i_s, j_s, window_size, stride)
+        i_s, j_s = from_R_to_im(i_s, j_s, window_size, stride, filter_size)
         image_grad_x, image_grad_y = compute_gaussian_grad(image_mat)
         for i, j in zip(i_s, j_s):  # i, j are the coordinates in R of POI
             patch_x = image_grad_x[i-patch_size//2:i+patch_size//2+1,
