@@ -29,11 +29,17 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
         Returns:
             - ndarray: the kernel matrix.
     '''
-    n_data = X.shape[0]
-    K = np.zeros((n_data, n_data))
-    for i in range(n_data):
-        for j in range(i+1):
-            K[i, j] = kernel(X[i, :], X[j, :],
-                             kernel_type=kernel_type, **kwargs)
-            K[j, i] = K[i, j]
-    return K
+    if kernel_type == "linear":
+        return X.dot(X.T)
+    elif kernel_type == "hellinger":
+        X = np.sqrt(X)
+        return X.dot(X.T)
+    else:
+        n_data = X.shape[0]
+        K = np.zeros((n_data, n_data))
+        for i in range(n_data):
+            for j in range(i+1):
+                K[i, j] = kernel(X[i, :], X[j, :],
+                                 kernel_type=kernel_type, **kwargs)
+                K[j, i] = K[i, j]
+        return K

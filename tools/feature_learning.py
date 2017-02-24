@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-from .corner_response_function import compute_gaussian_grad,\
+from .corner_response_function import convolve, difference_of_Gaussian_filters\
     compute_corner_response
 from .data_loading import load_images
 from .discretization import discretize_orientation, pin_as_vect
@@ -9,7 +9,8 @@ from .visualization import reshape_as_images, imshow
 
 
 def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
-                    filter_size=3, ratio_pins_per_image=25, data_type="train",
+                    filter_size=3, filter_sigma=0.25,
+                    ratio_pins_per_image=25, data_type="train",
                     index_to_visualize=[]):
     # data loading
     X = load_images(type=data_type)
@@ -25,11 +26,13 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
     R = np.zeros((n_images, R_size, R_size))
 
     im_size = image_list[0].shape[0]  # normally 32
+    filterx, filtery = difference_of_Gaussian_filters(shape=(5, 5),
+                                                      sigma=filter_sigma)
 
     # In this loop, for each image, we compute the corner response function.
     for image_index in range(n_images):
         image_mat = image_list[image_index]
-        image_grad_x, image_grad_y = compute_gaussian_grad(image_mat)
+        image_grad_x, image_grad_y = convolve(image_mat, filterx, filtery)
 
         for i in range(R_size):
             for j in range(R_size):

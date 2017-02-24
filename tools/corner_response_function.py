@@ -20,7 +20,7 @@ def compute_corner_response(I_x, I_y):
     return R
 
 
-def gaussian_filter_2d(shape=(3, 3), sigma=0.5):
+def gaussian_filter_2d(shape=(3, 3), sigma=0.25):
     """
     2D gaussian mask - should give the same result as MATLAB's
     fspecial('gaussian',[shape],[sigma])
@@ -54,18 +54,22 @@ def grad(im):
     return fx, fy
 
 
-# we compute the filter only once
-FILTERX, FILTERY = grad(gaussian_filter_2d(shape=(5, 5)))
-# we crop to avoid border effects
-FILTERX = FILTERX[1:-1, 1:-1]
-FILTERY = FILTERY[1:-1, 1:-1]
+def difference_of_Gaussian_filters(shape=(5, 5), sigma=0.25):
+    # we compute the filter only once
+    filterx, filtery = grad(gaussian_filter_2d(shape=shape), sigma=sigma)
+    # we crop to avoid border effects
+    filterx = filterx[1:-1, 1:-1]
+    filtery = filtery[1:-1, 1:-1]
+    return filterx, filtery
 
 
-def compute_gaussian_grad(image_mat):
+def convolve(image_mat, filterx, filtery):
     '''
     compute the difference of gradients along the x and y axis (two outputs)
     args :
         - image_mat nd array (image_size, image_size)
+        - filterx nd array
+        - filtery nd array
     returns :
         image_grad_x DoG x
         image_grad_y DoG y
@@ -77,28 +81,28 @@ def compute_gaussian_grad(image_mat):
     for i in range(image_mat.shape[0]):
         for j in range(image_mat.shape[1]):
             # x-axis indices for image
-            rmin = max(0, i - FILTERX.shape[0] // 2)
-            rmax = min(image_mat.shape[0], i + 1 + FILTERX.shape[0] // 2)
+            rmin = max(0, i - filterx.shape[0] // 2)
+            rmax = min(image_mat.shape[0], i + 1 + filterx.shape[0] // 2)
             # x-axis indices for filter
-            rmin_f = rmin - i + FILTERX.shape[0] // 2
-            rmax_f = rmax - i + FILTERX.shape[0] // 2
+            rmin_f = rmin - i + filterx.shape[0] // 2
+            rmax_f = rmax - i + filterx.shape[0] // 2
             if rmax_f == 0:
-                rmax_f = FILTERX.shape[0]
+                rmax_f = filterx.shape[0]
 
             # y-axis indices for image
-            smin = max(0, j - FILTERX.shape[1] // 2)
-            smax = min(image_mat.shape[1], j + 1 + FILTERX.shape[1] // 2)
+            smin = max(0, j - filterx.shape[1] // 2)
+            smax = min(image_mat.shape[1], j + 1 + filterx.shape[1] // 2)
             # y-axis indices for filter
-            smin_f = smin - j + FILTERX.shape[1] // 2
-            smax_f = smax - j + FILTERX.shape[1] // 2
+            smin_f = smin - j + filterx.shape[1] // 2
+            smax_f = smax - j + filterx.shape[1] // 2
             if smax_f == 0:
-                smax_f = FILTERX.shape[1]
+                smax_f = filterx.shape[1]
 
             image_grad_x[i, j] = np.sum(
-                image_mat[rmin:rmax, smin:smax] * FILTERX[rmin_f:rmax_f,
+                image_mat[rmin:rmax, smin:smax] * filterx[rmin_f:rmax_f,
                                                           smin_f:smax_f])
             image_grad_y[i, j] = np.sum(
-                image_mat[rmin:rmax, smin:smax] * FILTERY[rmin_f:rmax_f,
+                image_mat[rmin:rmax, smin:smax] * filtery[rmin_f:rmax_f,
                                                           smin_f:smax_f])
     # let's crop to avoid border effect
     image_grad_x = image_grad_x[1:-1, 1:-1]
