@@ -13,6 +13,8 @@ def kernel(x, y, kernel_type="linear", **kwargs):
     '''
     if kernel_type == "linear":
         return np.dot(x, y)
+    elif kernel_type == "hellinger":
+        return np.dot(np.sqrt(x), np.sqrt(y))
     else:
         raise ValueError("The {} kernel is not implemented".format(
             kernel_type))

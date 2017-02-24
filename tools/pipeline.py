@@ -50,7 +50,7 @@ Y_sample = Y_train[training_idx, :]
 
 
 # Training
-kernel_type = "linear"
+kernel_type = "hellinger"
 K_sample = kernel_matrix(X_sample, kernel_type=kernel_type)
 
 classifier_type = "linear regression"
