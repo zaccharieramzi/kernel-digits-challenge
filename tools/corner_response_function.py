@@ -56,7 +56,7 @@ def grad(im):
 
 def difference_of_Gaussian_filters(shape=(5, 5), sigma=0.25):
     # we compute the filter only once
-    filterx, filtery = grad(gaussian_filter_2d(shape=shape), sigma=sigma)
+    filterx, filtery = grad(gaussian_filter_2d(shape=shape, sigma=sigma))
     # we crop to avoid border effects
     filterx = filterx[1:-1, 1:-1]
     filtery = filtery[1:-1, 1:-1]

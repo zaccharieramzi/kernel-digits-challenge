@@ -1,8 +1,8 @@
 import numpy as np
 import time
 
-from .corner_response_function import convolve, difference_of_Gaussian_filters\
-    compute_corner_response
+from .corner_response_function import convolve,\
+    difference_of_Gaussian_filters, compute_corner_response
 from .data_loading import load_images
 from .discretization import discretize_orientation, pin_as_vect
 from .visualization import reshape_as_images, imshow
@@ -28,11 +28,14 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
     im_size = image_list[0].shape[0]  # normally 32
     filterx, filtery = difference_of_Gaussian_filters(shape=(5, 5),
                                                       sigma=filter_sigma)
+    # list containing all gradient with regard to x and y couples
+    grads = list()
 
     # In this loop, for each image, we compute the corner response function.
     for image_index in range(n_images):
         image_mat = image_list[image_index]
         image_grad_x, image_grad_y = convolve(image_mat, filterx, filtery)
+        grads.append((image_grad_x, image_grad_y))
 
         for i in range(R_size):
             for j in range(R_size):
@@ -69,7 +72,7 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
             R[image_idx] > np.percentile(R[image_idx],
                                          100 - ratio_pins_per_image))
         i_s, j_s = from_R_to_im(i_s, j_s, window_size, stride, filter_size)
-        image_grad_x, image_grad_y = compute_gaussian_grad(image_mat)
+        image_grad_x, image_grad_y = grads[image_idx]
         for i, j in zip(i_s, j_s):  # i, j are the coordinates in R of POI
             patch_x = image_grad_x[i-patch_size//2:i+patch_size//2+1,
                                    j-patch_size//2:j+patch_size//2+1]
