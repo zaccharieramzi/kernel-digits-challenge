@@ -20,7 +20,7 @@ def compute_corner_response(I_x, I_y):
     return R
 
 
-def gaussian_filter_2d(shape=(3, 3), sigma=0.5):
+def gaussian_filter_2d(shape=(3, 3), sigma=0.25):
     """
     2D gaussian mask - should give the same result as MATLAB's
     fspecial('gaussian',[shape],[sigma])
