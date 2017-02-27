@@ -34,7 +34,7 @@ pins_train = pins_dict_train["pins"]
 train_pins = pins_dict_train["train_pins"]
 pin_to_im_train = pins_dict_train["pin_to_im"]
 pins_mat = np.vstack(train_pins)
-visual_features = kmeans(pins_mat, 70)
+visual_features, _ = kmeans(pins_mat, 70)
 
 # Data processing
 X_train = process_images(n_train, visual_features, pins_train, pin_to_im_train)
