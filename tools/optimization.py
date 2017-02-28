@@ -39,7 +39,7 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
                 W = np.eye(n)
                 z = np.zeros(n)
                 for iter in range(n_iter):
-                    alpha = solveWKRR(K, W, z, lamb)
+                    alpha = solveWKRR(K, W, z, lamb, n)
                     m = K.dot(alpha)
                     W = np.diag(sigma(m)*sigma(-m))
                     z = m + Y/sigma(-Y*m)
@@ -60,7 +60,7 @@ def sigma(X):
     return 1/(1+np.exp(-X))
 
 
-def solveWKRR(K, W, z, lamb):
+def solveWKRR(K, W, z, lamb, n):
     '''
     solve a weighted linear regression problem for the logistic regression
     purpose
@@ -74,5 +74,5 @@ def solveWKRR(K, W, z, lamb):
     '''
     W_sqrt = np.sqrt(W)
     I = lamb*n*np.eye(n)
-    return W_sqrt.dot(np.linalg.solve((W_sqrt.dot(K).dot(W_sqrt) + I,
-                                      W_sqrt.dot(z))))
+    return W_sqrt.dot(np.linalg.solve((W_sqrt.dot(K).dot(W_sqrt) + I),
+                                      W_sqrt.dot(z)))
