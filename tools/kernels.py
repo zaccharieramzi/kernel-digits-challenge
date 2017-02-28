@@ -16,13 +16,13 @@ def kernel(x, y, kernel_type="linear", **kwargs):
         return np.dot(x, y)
     elif kernel_type == "hellinger":
         return np.dot(np.sqrt(x), np.sqrt(y))
-    elif kernel_type == "rbf":
+    elif "rbf" in kernel_type:
         try:
             sigma = kwargs["sigma"]
         except KeyError:
             raise KeyError("You need a sigma argument to compute a Radial"
                            "Basis Function")
-        return np.exp(-np.linalg.norm(x - y) / sigma ** 2)
+        return np.exp(-np.linalg.norm(x - y)**2 / sigma ** 2)
     else:
         raise ValueError("The {} kernel is not implemented".format(
             kernel_type))
@@ -48,8 +48,7 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
         except KeyError:
             raise KeyError("You need a sigma argument to compute a Radial"
                            "Basis Function")
-        pairwise_dists = squareform(pdist(X, 'euclidean'))
-        return np.exp(pairwise_dists ** 2 / sigma ** 2)
+        return np.exp(-pairwise_dists ** 2 / sigma ** 2)
     else:
         n_data = X.shape[0]
         K = np.zeros((n_data, n_data))
