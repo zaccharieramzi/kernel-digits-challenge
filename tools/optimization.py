@@ -39,7 +39,7 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
                 W = np.eye(n)
                 z = np.zeros(n)
                 for iter in range(n_iter):
-                    alpha = solveWKRR(K, W, z)
+                    alpha = solveWKRR(K, W, z, lamb)
                     m = K.dot(alpha)
                     W = np.diag(sigma(m)*sigma(-m))
                     z = m + Y/sigma(-Y*m)
@@ -60,7 +60,7 @@ def sigma(X):
     return 1/(1+np.exp(-X))
 
 
-def solveWKRR(K, W, z):
+def solveWKRR(K, W, z, lamb):
     '''
     solve a weighted linear regression problem for the logistic regression
     purpose
@@ -68,6 +68,7 @@ def solveWKRR(K, W, z):
            - K ndarray (., .): the kernel matrix
            - W ndarray (., .): the weights. Here the hessian of the sigmoid
            - z ndarray (., .): play the paper of Y
+           - lamb : regularization parameter
     Returns :
              - the solution alpha at each step
     '''
