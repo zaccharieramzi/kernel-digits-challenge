@@ -1,3 +1,4 @@
+import os
 import os.path as op
 
 import numpy as np
@@ -25,7 +26,7 @@ def labels_to_csv(Y, kernel="linear", algo="linear regression", user="Zac",
             user=user
         )
     outfolder_path = "submissions"
-    if not os.path.isdir(outfolder_path):
+    if not op.isdir(outfolder_path):
         os.mkdir(outfolder_path)
 
     df_labels.to_csv(op.join(outfolder_path, file_name))
