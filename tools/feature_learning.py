@@ -51,12 +51,11 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
             i, j = np.where(
                 R[image_index] > np.percentile(R[image_index],
                                                100 - ratio_pins_per_image))
-            i, j = from_R_to_im(x, y, window_size, stride, filter_size)
 
+            i, j = from_R_to_im(i, j, window_size, stride, filter_size)
             x, y = j, i
-
             heatmap = R_to_heatmap(R[image_index], window_size, stride,
-                                   im_size)
+                                   im_size, filter_size)
             imshow(image_list[image_index], points_of_interest=(x, y),
                    heatmap=heatmap)
             continue
@@ -109,13 +108,13 @@ def from_R_to_im(x, y, window_size, stride, filter_size):
     return (x, y)
 
 
-def R_to_heatmap(R, window_size, stride, im_size):
+def R_to_heatmap(R, window_size, stride, im_size, filter_size):
     R_size = R.shape[0]
     # create heatmap
     heatmap = np.zeros((im_size, im_size))
     for i in range(R_size):
         for j in range(R_size):
-            ix, iy = from_R_to_im(i, j, window_size, stride)
+            ix, iy = from_R_to_im(i, j, window_size, stride, filter_size)
             heatmap[ix:ix+window_size,
                     iy:iy+window_size] = R[i, j]
     heatmap /= heatmap.max()
