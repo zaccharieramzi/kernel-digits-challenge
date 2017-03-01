@@ -78,8 +78,8 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
                                    j-patch_size//2:j+patch_size//2+1]
             patch_y = image_grad_y[i-patch_size//2:i+patch_size//2+1,
                                    j-patch_size//2:j+patch_size//2+1]
-            pin_as_matrix = discretize_orientation(patch_x, patch_y)
-            pin = pin_as_vect(pin_as_matrix)
+            pin_as_matrix, w = discretize_orientation(patch_x, patch_y)
+            pin = pin_as_vect(pin_as_matrix, w)
             pins.append(pin)  # pins is list of all pins for all images
             # for visualization purposes
             pin_to_im[len(pins)-1] = image_idx
