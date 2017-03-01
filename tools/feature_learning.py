@@ -3,7 +3,7 @@ import time
 
 from .corner_response_function import convolve,\
     difference_of_Gaussian_filters, compute_corner_response
-from .data_loading import load_images
+from .data_loading import load_images_resized as load_images
 from .discretization import discretize_orientation, pin_as_vect
 from .visualization import reshape_as_images, imshow
 
@@ -14,8 +14,8 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
                     index_to_visualize=[]):
     # data loading
     X = load_images(type=data_type)
-    image_list = reshape_as_images(X)
-    image_list = image_list.mean(axis=3)
+    image_list = X.copy()
+    # image_list = image_list.mean(axis=3)
     n_images = image_list.shape[0]
 
     # R contains all the corner response functions for all images.
@@ -74,11 +74,20 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
         i_s, j_s = from_R_to_im(i_s, j_s, window_size, stride, filter_size)
         image_grad_x, image_grad_y = grads[image_idx]
         for i, j in zip(i_s, j_s):  # i, j are the coordinates in R of POI
-            patch_x = image_grad_x[i-patch_size//2:i+patch_size//2+1,
-                                   j-patch_size//2:j+patch_size//2+1]
-            patch_y = image_grad_y[i-patch_size//2:i+patch_size//2+1,
-                                   j-patch_size//2:j+patch_size//2+1]
+            patch_x = image_grad_x[i-patch_size//2:
+                                   i+patch_size//2+patch_size % 2,
+                                   j-patch_size//2:
+                                   j+patch_size//2+patch_size % 2]
+            patch_y = image_grad_y[i-patch_size//2:
+                                   i+patch_size//2+patch_size % 2,
+                                   j-patch_size//2:
+                                   j+patch_size//2+patch_size % 2]
             pin_as_matrix = discretize_orientation(patch_x, patch_y)
+            pin = np.empty(16 * 4)
+            pin[:16] = pin_as_vect(pin_as_matrix[:patch_size//2, :patch_size//2])
+            pin[16:32] = pin_as_vect(pin_as_matrix[patch_size//2:, :patch_size//2])
+            pin[32:48] = pin_as_vect(pin_as_matrix[:patch_size//2, patch_size//2:])
+            pin[48:] = pin_as_vect(pin_as_matrix[patch_size//2:, patch_size//2:])
             pin = pin_as_vect(pin_as_matrix)
             pins.append(pin)  # pins is list of all pins for all images
             # for visualization purposes

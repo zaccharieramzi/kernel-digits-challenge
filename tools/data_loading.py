@@ -1,5 +1,7 @@
 import numpy as np
-
+import h5py
+import PIL.Image as Im
+import os
 
 def load_labels():
     '''
@@ -46,3 +48,60 @@ def load_images(type="train"):
             X[i] = np.fromstring(line[:line.index(',\n')], dtype=np.float32,
                                  sep=",")
         return X
+
+
+def load_images_resized(type="train"):
+    '''
+    Args :
+           - type (str): "train" or "test"
+    Returns :
+           - X ndarray (5000,3072)
+    '''
+    if type not in ("train", "test"):
+        raise ValueError("type {} unknown, it should be either"
+                         "'train' or 'test'".format(type))
+    dataset_path = "data/{:s}_resized.hdf5".format(type)
+
+    with h5py.File(dataset_path, "r") as h5f:
+        return np.array(h5f["images"])
+
+
+def store_resized_images(type="train"):
+    if type == "train":
+        root_path = "data/images_train_resize"
+    elif type == "test":
+        root_path = "data/test_images_resize"
+    else:
+        raise ValueError("type {} unknown, it should be either"
+                         "'train' or 'test'".format(type))
+
+    if not os.path.isdir(root_path):
+        print("Data not at expected path : '{:s}'".format(root_path))
+
+    if type == "train":
+        images = np.empty((5000, 63, 63))
+        index = 0
+        for i in range(10):
+            print("folder number {}".format(i))
+            im_dir = os.path.join(root_path, str(i))
+
+            images_path = [os.path.join(im_dir, f) for f in os.listdir(im_dir)
+                           if f[-4:] == ".png"]
+            for im in images_path:
+                images[index] = np.array(Im.open(im))
+
+                index += 1
+    else:
+        im_dir = root_path
+        images_path = [os.path.join(im_dir, f) for f in os.listdir(im_dir)
+                       if f[-4:] == ".png"]
+
+        images = np.empty((len(images_path), 63, 63))
+        index = 0
+        for im in images_path:
+            images[index] = np.array(Im.open(im))
+            index += 1
+
+    with h5py.File(os.path.join("data", type+"_resized.hdf5"), "w") as h5f:
+        dset = h5f.create_dataset("images", data=images)
+        h5f.flush()
