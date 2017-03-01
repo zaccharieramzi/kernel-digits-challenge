@@ -1,3 +1,5 @@
+from random import randint
+
 import numpy as np
 
 
@@ -44,8 +46,42 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
                     W = np.diag(sigma(m)*sigma(-m))
                     z = m + Y/sigma(-Y*m)
                 return alpha
+    elif prob_type == "svm":
+        try:
+            lamb = kwargs["lamb"]
+        except KeyError:
+            raise KeyError("You need a lamb argument when performing an svm")
+        else:
+            n_iter = kwargs.get("n_iter", 10000)
+            return svm(K, Y, lamb, n_iter)
     else:
         raise ValueError("{} is not implemented.".format(prob_type))
+
+
+def svm(K, Y, lamb, n_iter=10000):
+    '''Solving the SVM quadratic problem with a coordinate descent.
+        Args:
+            - K (ndarray): the kernel matrix of the observations.
+            - Y (ndarray): the labels of the observations.
+            - lamb (float): the regularization parameter.
+            - n_iter (int): the number of iterations for the coordinate
+            descent.
+    '''
+    Y_svm = 2*Y - 1
+    n = K.shape[0]
+    alpha = np.zeros(n)
+    alpha_new = np.ones(n)
+    for i in range(n_iter):
+        alpha_new = alpha
+        j = randint(0, n - 1)
+        beta = (Y_svm[j] + K[j, j]*alpha[j] - np.dot(alpha, K[:, j])) / K[j, j]
+        if Y_svm[j] * beta < 0:
+            alpha_new[j] = 0
+        elif Y_svm[j] * beta < 1 / (2*lamb*n):
+            alpha_new[j] = beta
+        else:
+            alpha_new[j] = Y_svm[j] / (2*lamb*n)
+    return alpha_new
 
 
 def sigma(X):
