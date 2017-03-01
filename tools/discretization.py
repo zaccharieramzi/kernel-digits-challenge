@@ -12,23 +12,25 @@ def discretize_orientation(patch_x, patch_y):
     '''
     orientation = np.arctan2(patch_y, patch_x)
     discrete_or = np.round(8*orientation / np.pi)
-    return discrete_or
+    weights = np.linalg.norm(np.stack((patch_x, patch_y)), axis=0)
+    return discrete_or, weights
 
 
-def pin_as_vect(discrete_or):
+def pin_as_vect(discrete_or, weights):
     '''
     Converting the orientation matrix to a pin (to be used in kmeans)
     args :
         - discrete_or: pin as a matrix patch_size*patch_size
+        - weights: a matrix containing the length of each vector
     return
         - vect: pin as a vector counting orientation occurences
     '''
     vect = np.zeros(16)
-    for row in discrete_or:
-        for el in row:
+    for i, row in enumerate(discrete_or):
+        for j, el in enumerate(row):
             if el >= 0:
                 idx = int(el)
             else:
                 idx = 16 + int(el)
-            vect[idx] += 1
+            vect[idx] += weights[i, j]
     return vect
