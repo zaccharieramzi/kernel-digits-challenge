@@ -24,4 +24,8 @@ def labels_to_csv(Y, kernel="linear", algo="linear regression", user="Zac",
             algo=algo,
             user=user
         )
-    df_labels.to_csv(op.join("submissions", file_name))
+    outfolder_path = "submissions"
+    if not os.path.isdir(outfolder_path):
+        os.mkdir(outfolder_path)
+
+    df_labels.to_csv(op.join(outfolder_path, file_name))

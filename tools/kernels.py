@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import pdist, squareform
 
 
 def kernel(x, y, kernel_type="linear", **kwargs):
@@ -13,6 +14,15 @@ def kernel(x, y, kernel_type="linear", **kwargs):
     '''
     if kernel_type == "linear":
         return np.dot(x, y)
+    elif kernel_type == "hellinger":
+        return np.dot(np.sqrt(x), np.sqrt(y))
+    elif "rbf" in kernel_type:
+        try:
+            sigma = kwargs["sigma"]
+        except KeyError:
+            raise KeyError("You need a sigma argument to compute a Radial"
+                           "Basis Function")
+        return np.exp(-np.linalg.norm(x - y)**2 / sigma ** 2)
     else:
         raise ValueError("The {} kernel is not implemented".format(
             kernel_type))
@@ -27,11 +37,25 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
         Returns:
             - ndarray: the kernel matrix.
     '''
-    n_data = X.shape[0]
-    K = np.zeros((n_data, n_data))
-    for i in range(n_data):
-        for j in range(i+1):
-            K[i, j] = kernel(X[i, :], X[j, :],
-                             kernel_type=kernel_type, **kwargs)
-            K[j, i] = K[i, j]
-    return K
+    if kernel_type == "linear":
+        return X.dot(X.T)
+    elif kernel_type == "hellinger":
+        X = np.sqrt(X)
+        return X.dot(X.T)
+    elif kernel_type == "rbf":
+        try:
+            sigma = kwargs["sigma"]
+        except KeyError:
+            raise KeyError("You need a sigma argument to compute a Radial"
+                           "Basis Function")
+        pairwise_dists = squareform(pdist(X, 'euclidean'))
+        return np.exp(-pairwise_dists ** 2 / sigma ** 2)
+    else:
+        n_data = X.shape[0]
+        K = np.zeros((n_data, n_data))
+        for i in range(n_data):
+            for j in range(i + 1):
+                K[i, j] = kernel(X[i, :], X[j, :],
+                                 kernel_type=kernel_type, **kwargs)
+                K[j, i] = K[i, j]
+        return K
