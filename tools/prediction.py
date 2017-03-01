@@ -19,9 +19,16 @@ def pred(X_train, X_pred, alpha, kernel_type="linear", **kwargs):
     '''
     n_train = X_train.shape[0]
     n_pred = X_pred.shape[0]
-    K = np.zeros((n_pred, n_train))
-    for i in range(n_pred):
-        for j in range(n_train):
-            K[i, j] = kernel(X_pred[i], X_train[j], kernel_type=kernel_type,
-                             **kwargs)
+    if kernel_type == "linear":
+        K = X_pred.dot(X_train.T)
+    elif kernel_type == "hellinger":
+        X_pred = np.sqrt(X_pred)
+        X_train = np.sqrt(X_train)
+        K = X_pred.dot(X_train.T)
+    else:
+        K = np.zeros((n_pred, n_train))
+        for i in range(n_pred):
+            for j in range(n_train):
+                K[i, j] = kernel(
+                    X_pred[i], X_train[j], kernel_type=kernel_type, **kwargs)
     return K.dot(alpha)
