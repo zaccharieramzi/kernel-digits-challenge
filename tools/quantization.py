@@ -3,11 +3,12 @@ import math
 import numpy as np
 
 
-def kmeans(X, k):
+def kmeans(X, k, frac=0, verbose=True):
     '''Performs the Kmeans algorithm on X with k clusters.
         Args:
             - X (ndarray): the points you want to cluster.
             - k (int): the number of cluster you want.
+            - frac (float) if less than this fraction of points change cluster we stop
         Output:
             - ndarray: the centroids.
     '''
@@ -28,7 +29,8 @@ def kmeans(X, k):
         j += 1
     centroids = np.vstack(centroids)
     diff = math.inf
-    while diff > 0:
+    frac = int(frac * n)
+    while diff > frac:
         # Assignment
         Y_new = np.argmin(np.linalg.norm(X[:, None, :] - centroids, axis=2),
                           axis=1)
@@ -40,7 +42,8 @@ def kmeans(X, k):
         diff = np.sum(Y_new != Y)
         centroids = new_centroids
         Y = Y_new
-        print("Wrongly clusterized pins: {}".format(diff))
+        if verbose:
+            print("Wrongly clusterized pins: {}".format(diff))
     return centroids, Y
 
 
@@ -113,7 +116,7 @@ def npgauss(X, mu, sig):
     return np.exp(exposant)/(2*np.pi*det)
 
 
-def em_full(data, k, max_iter=100):
+def em_full(data, k, max_iter=100, verbose=True):
     '''
     Computes gaussian mixture models through an EM algorithm
     args :
@@ -129,36 +132,38 @@ def em_full(data, k, max_iter=100):
     sigma = np.empty((k, data_size, data_size))
 
     # initialisation
-    [centroids, labels] = kmeans(data, k)
-    for c in range(len(centroids)):
-        # mu is initialised with the centroid position
-        mu[c, :] = data[labels == c].mean(axis=0)
-        # pi with the proportion of elements in the cluster
-        pi[c] = labels[labels == c].shape[0] / len(labels)
-        # sigma with the sum of the squared distance to the centroid
-        sigma[c] = np.cov(data[labels == c].T)
-    sigma2 = sigma.copy()
-    for i in range(max_iter):
-        # Estimation
-        for j in range(k):
-            q[:, j] = pi[j] * npgauss(data, mu[j], sigma[j])
-        # [:, None] -> dividing each row by a different v
-        q[:] = q[:] / np.sum(q, axis=1)[:, None]
-        # Maximisation
-        for j in range(k):
-            # update pi mu and sigma
-            pi[j] = q[:, j].sum() / q.sum()
-            mu[j] = (q[:, j][:, None] * data).sum(axis=0) / q[:, j].sum()
+    [centroids, labels] = kmeans(data, k, frac=0.03, verbose=verbose)
+    try:
+        for c in range(len(centroids)):
+            # mu is initialised with the centroid position
+            mu[c, :] = data[labels == c].mean(axis=0)
+            # pi with the proportion of elements in the cluster
+            pi[c] = labels[labels == c].shape[0] / len(labels)
+            # sigma with the sum of the squared distance to the centroid
+            sigma[c] = np.cov(data[labels == c].T)
+        for i in range(max_iter):
+            # Estimation
+            for j in range(k):
+                q[:, j] = pi[j] * npgauss(data, mu[j], sigma[j])
+            # [:, None] -> dividing each row by a different v
+            q[:] = q[:] / np.sum(q, axis=1)[:, None]
+            # Maximisation
+            for j in range(k):
+                # update pi mu and sigma
+                pi[j] = q[:, j].sum() / q.sum()
+                mu[j] = (q[:, j][:, None] * data).sum(axis=0) / q[:, j].sum()
 
-            sigma[j] = (q[:, j][:, None] * (data-mu[j])).T.dot(data-mu[j])
-            sigma[j] /= q[:, j].sum()
-        # we stop if the centroids converged
-        if np.linalg.norm(mu - centroids) < 10e-3:
-            break
-        else:
-            centroids = mu.copy()
-    print("after {:d} iterations".format(i))
-    # for each point the highest q value indicates cluster
-    labels = np.argmax(q, axis=1)
-    # plot(data, mu, sigma, labels)
+                sigma[j] = (q[:, j][:, None] * (data-mu[j])).T.dot(data-mu[j])
+                sigma[j] /= q[:, j].sum()
+
+            # we stop if the centroids converged
+            if np.linalg.norm(mu - centroids) < 10e-3:
+                break
+            else:
+                centroids = mu.copy()
+        if verbose:
+            print("after {:d} iterations".format(i))
+    except:
+        return pi, centroids, sigma, q
+
     return pi, mu, sigma, q

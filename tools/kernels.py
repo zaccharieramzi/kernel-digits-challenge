@@ -48,6 +48,7 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
         except KeyError:
             raise KeyError("You need a sigma argument to compute a Radial"
                            "Basis Function")
+        pairwise_dists = squareform(pdist(X, 'euclidean'))
         return np.exp(-pairwise_dists ** 2 / sigma ** 2)
     else:
         n_data = X.shape[0]
