@@ -31,7 +31,7 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
                 n_iter = kwargs["n_iter"]
             except KeyError:
                 raise KeyError("You need a n_iter argument when performing a \
-                               linear regression")
+                               logistic regression")
             else:
                 n = len(Y)
                 Y = 2*Y - 1
@@ -67,7 +67,7 @@ def solveWKRR(K, W, z, lamb, n):
     Args :
            - K ndarray (., .): the kernel matrix
            - W ndarray (., .): the weights. Here the hessian of the sigmoid
-           - z ndarray (., .): play the paper of Y
+           - z ndarray (., .): play the role of Y
            - lamb : regularization parameter
     Returns :
              - the solution alpha at each step
