@@ -60,9 +60,7 @@ def vf_vector(pins, centroids, pin_to_im, n):
     vf_vector = np.zeros((n, k))
     pins = np.vstack(pins)
 
-    y = np.argmin(np.linalg.norm(pins[:, None, :] - centroids, axis=2), axis=1)
-
     for idx, pin in enumerate(pins):
-        y_pin = y[idx]
+        y_pin = np.argmin(np.linalg.norm(pin - centroids, axis=1))
         vf_vector[pin_to_im[idx], y_pin] += 1
     return vf_vector

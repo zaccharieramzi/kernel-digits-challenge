@@ -80,7 +80,6 @@ def store_resized_images(type="train"):
 
     if type == "train":
         images = np.empty((5000, 63, 63))
-        index = 0
         for i in range(10):
             print("folder number {}".format(i))
             im_dir = os.path.join(root_path, str(i))
@@ -88,9 +87,9 @@ def store_resized_images(type="train"):
             images_path = [os.path.join(im_dir, f) for f in os.listdir(im_dir)
                            if f[-4:] == ".png"]
             for im in images_path:
+                index = int(im.split('.')[0].split('/')[-1])
                 images[index] = np.array(Im.open(im))
 
-                index += 1
     else:
         im_dir = root_path
         images_path = [os.path.join(im_dir, f) for f in os.listdir(im_dir)
