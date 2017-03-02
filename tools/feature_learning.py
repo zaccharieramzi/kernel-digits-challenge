@@ -3,7 +3,7 @@ import time
 
 from .corner_response_function import convolve,\
     difference_of_Gaussian_filters, compute_corner_response
-from .data_loading import load_images_resized as load_images
+from .data_loading import load_images_resized, load_images
 from .discretization import discretize_orientation, pin_as_vect
 from .visualization import reshape_as_images, imshow
 
@@ -11,11 +11,16 @@ from .visualization import reshape_as_images, imshow
 def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
                     filter_size=3, filter_sigma=0.25,
                     ratio_pins_per_image=25, data_type="train",
-                    index_to_visualize=[]):
+                    index_to_visualize=[], resized=False):
     # data loading
-    X = load_images(type=data_type)
-    image_list = X.copy()
-    # image_list = image_list.mean(axis=3)
+    if not resized:
+        X = load_images(type=data_type)
+        image_list = reshape_as_images(X)
+        image_list = image_list.mean(axis=3)
+    else:
+        X = load_images_resized(type=data_type)
+        image_list = X.copy()
+
     n_images = image_list.shape[0]
 
     # R contains all the corner response functions for all images.
