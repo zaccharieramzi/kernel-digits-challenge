@@ -15,7 +15,8 @@ def discretize_orientation(patch_x, patch_y, signed=True, disc_grid=16):
     orientation = np.arctan2(patch_y, patch_x)
     discrete_or = np.round((disc_grid//2)*orientation / np.pi)
     if not signed:
-        discrete_or[discrete_or <= 0] = discrete_or[discrete_or <= 0] + 8
+        discrete_or[discrete_or < 0] = discrete_or[discrete_or < 0] + 8
+        discrete_or[discrete_or == 8] = 0
     weights = np.linalg.norm(np.stack((patch_x, patch_y)), axis=0)
     return discrete_or, weights
 

@@ -22,10 +22,10 @@ def hog(
         signed=False,
         disc_grid=16)
     n_cells = image_size // hog_cell_size
-    cells_vector = np.zeros((n_cells, n_cells, discretization))
+    cells_vector = np.zeros((n_cells, n_cells, disc_grid//2))
     for i in range(n_cells):
         for j in range(n_cells):
-            cells_vector[i, j, :] = pins_as_vect(
+            cells_vector[i, j, :] = pin_as_vect(
                 discrete_or=ori[
                     i * hog_cell_size:(i + 1) * hog_cell_size,
                     j * hog_cell_size:(j + 1) * hog_cell_size
@@ -34,5 +34,5 @@ def hog(
                     i * hog_cell_size:(i + 1) * hog_cell_size,
                     j * hog_cell_size:(j + 1) * hog_cell_size
                 ],
-                disc_grid=disc_grad)
+                disc_grid=disc_grid)
     return cells_vector.reshape((n_cells**2, disc_grid//2))
