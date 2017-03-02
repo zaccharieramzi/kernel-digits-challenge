@@ -100,3 +100,4 @@ submissions/
 # images dump
 test_images/
 train_images/
+*.png

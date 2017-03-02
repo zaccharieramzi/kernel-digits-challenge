@@ -61,32 +61,47 @@ def dump_as_png(type='test', number=None):
         Img.fromarray(X[i]).save(filename)
 
 
-def imshow(x):
+def imshow(x, points_of_interest=None, heatmap=None):
     '''
-    Visualize a single vector using matplotlib
+    Visualize a single vector or an image using matplotlib
     Args :
-        - x nd array (3072) input vector
+        - x nd array (3072) input vector or reshape as an image
+            the image can be colored or not.
+        - points_of_interest tuple of lists of coordinates
     '''
     img_len = x.shape[0]
     img_size = int(sqrt(img_len // 3))
 
-    img = np.empty((img_size, img_size, 3))
-    for c in range(3):
-        img[:, :, c] = x[1024 * c:1024 * (c + 1)].reshape(
-            (img_size, img_size))
+    if len(x.shape) == 1:
+        img = np.empty((img_size, img_size, 3))
+        for c in range(3):
+            img[:, :, c] = x[1024 * c:1024 * (c + 1)].reshape(
+                (img_size, img_size))
 
-    # rescaling per channel
-    img = img - img.min(axis=(0, 1))[None, None, :]
-    img = img / img.max(axis=(0, 1))[None, None, :]
+    else:
+        img = x
+    # rescaling for all channels
+    img = img - img.min()
+    img = img / img.max()
 
-    # # format as 8 bit
-    # img *= 255
-    # img = img.astype(np.uint8)
-
-    plt.imshow(img, interpolation='nearest')
+    if heatmap is not None:
+        f, (ax1, ax2) = plt.subplots(1, 2)
+    else:
+        f, ax1 = plt.subplots()
+    if len(img.shape) == 3:
+        ax1.imshow(img, interpolation='nearest')
+    else:
+        cm = plt.cm.get_cmap('Greys')
+        ax1.imshow(img, cmap=cm, interpolation='nearest')
+    if points_of_interest:
+        x, y = points_of_interest
+        ax1.scatter(x, y)
+    if heatmap is not None:
+        ax2.imshow(heatmap, interpolation="nearest")
     plt.show()
 
-def reshape_as_images(x):
+
+def reshape_as_images(X):
     '''
     Reshape the data as a vector of images
     '''
