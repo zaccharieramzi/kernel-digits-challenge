@@ -25,5 +25,14 @@ def hog(
     cells_vector = np.zeros((n_cells, n_cells, discretization))
     for i in range(n_cells):
         for j in range(n_cells):
-            cells_vector[i, j, :] = pins_as_vect(ori, w, disc_grid=disc_grad)
+            cells_vector[i, j, :] = pins_as_vect(
+                discrete_or=ori[
+                    i * hog_cell_size:(i + 1) * hog_cell_size,
+                    j * hog_cell_size:(j + 1) * hog_cell_size
+                ],
+                weights=w[
+                    i * hog_cell_size:(i + 1) * hog_cell_size,
+                    j * hog_cell_size:(j + 1) * hog_cell_size
+                ],
+                disc_grid=disc_grad)
     return cells_vector.reshape((n_cells**2, disc_grid//2))
