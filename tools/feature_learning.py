@@ -1,5 +1,4 @@
 import numpy as np
-import time
 
 from .corner_response_function import convolve,\
     difference_of_Gaussian_filters, compute_corner_response
@@ -15,14 +14,13 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
     # data loading
     X = load_images(type=data_type)
     image_list = reshape_as_images(X)
-    image_list = image_list.mean(axis=3)
     n_images = image_list.shape[0]
 
     # R contains all the corner response functions for all images.
     # Each corner response function is given by a matrix of size
     # R_size x R_size, which gives for each window running through the image
     # the corner response function.
-    R_size = (image_list.shape[1] - window_size - filter_size)//stride + 1
+    R_size = (image_list.shape[1] - window_size - filter_size) // stride + 1
     R = np.zeros((n_images, R_size, R_size))
 
     im_size = image_list[0].shape[0]  # normally 32
@@ -33,16 +31,35 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
 
     # In this loop, for each image, we compute the corner response function.
     for image_index in range(n_images):
-        image_mat = image_list[image_index]
-        image_grad_x, image_grad_y = convolve(image_mat, filterx, filtery)
-        grads.append((image_grad_x, image_grad_y))
+        image_mats = image_list[image_index]
+        n_colors = image_mats.shape[2]
+        # image_grad_x represents the gaussian gradient of the image in x for
+        # all three colors. However, for each the color, the gradient is
+        # represented as a line to compute the best for each color.
+        image_grad_x = np.zeros((n_colors, im_size**2))
+        image_grad_y = np.zeros((n_colors, im_size**2))
+
+        for c in range(n_colors):
+            grad_x, grad_y = convolve(image_mats[:, :, c], filterx, filtery)
+            image_grad_x[c, :] = grad_x.reshape((im_size**2,))
+            image_grad_y[c, :] = grad_y.reshape((im_size**2,))
+
+        image_grad_n = np.sqrt(image_grad_x**2 + image_grad_y**2)
+        best_colors = np.argmax(image_grad_n, axis=0)
+        best_grad_x = image_grad_x[best_colors, np.arange(im_size**2)].reshape(
+            (im_size, im_size))
+        best_grad_y = image_grad_y[best_colors, np.arange(im_size**2)].reshape(
+            (im_size, im_size))
+        grads.append((best_grad_x, best_grad_y))
 
         for i in range(R_size):
             for j in range(R_size):
-                I_x = image_grad_x[i*stride:i*stride+window_size,
-                                   j*stride:j*stride+window_size]
-                I_y = image_grad_y[i*stride:i*stride+window_size,
-                                   j*stride:j*stride+window_size]
+                I_x = best_grad_x[
+                    i * stride:i * stride + window_size,
+                    j * stride:j * stride + window_size]
+                I_y = best_grad_y[
+                    i * stride:i * stride + window_size,
+                    j * stride:j * stride + window_size]
 
                 R[image_index, i, j] = compute_corner_response(I_x, I_y)
         # absoluting of R (because we are interested in the absolute value)
@@ -51,12 +68,12 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
             i, j = np.where(
                 R[image_index] > np.percentile(R[image_index],
                                                100 - ratio_pins_per_image))
-            i, j = from_R_to_im(x, y, window_size, stride, filter_size)
+            i, j = from_R_to_im(i, j, window_size, stride, filter_size)
 
             x, y = j, i
 
-            heatmap = R_to_heatmap(R[image_index], window_size, stride,
-                                   im_size)
+            heatmap = R_to_heatmap(
+                R[image_index], window_size, stride, im_size, filter_size)
             imshow(image_list[image_index], points_of_interest=(x, y),
                    heatmap=heatmap)
             continue
@@ -67,22 +84,23 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
     # In this loop, we retrieve the gradient patch associated with each point
     # that we identified as interesting. We then discretize and vectorize it.
     for image_idx in range(n_images):
-        image_mat = image_list[image_idx]
         i_s, j_s = np.where(
             R[image_idx] > np.percentile(R[image_idx],
                                          100 - ratio_pins_per_image))
         i_s, j_s = from_R_to_im(i_s, j_s, window_size, stride, filter_size)
         image_grad_x, image_grad_y = grads[image_idx]
         for i, j in zip(i_s, j_s):  # i, j are the coordinates in R of POI
-            patch_x = image_grad_x[i-patch_size//2:i+patch_size//2+1,
-                                   j-patch_size//2:j+patch_size//2+1]
-            patch_y = image_grad_y[i-patch_size//2:i+patch_size//2+1,
-                                   j-patch_size//2:j+patch_size//2+1]
+            patch_x = image_grad_x[
+                i - patch_size // 2:i + patch_size // 2 + 1,
+                j - patch_size // 2:j + patch_size // 2 + 1]
+            patch_y = image_grad_y[
+                i - patch_size // 2:i + patch_size // 2 + 1,
+                j - patch_size // 2:j + patch_size // 2 + 1]
             pin_as_matrix, w = discretize_orientation(patch_x, patch_y)
             pin = pin_as_vect(pin_as_matrix, w)
             pins.append(pin)  # pins is list of all pins for all images
             # for visualization purposes
-            pin_to_im[len(pins)-1] = image_idx
+            pin_to_im[len(pins) - 1] = image_idx
             if image_idx in training_idx:
                 train_pins.append(pin)
 
@@ -93,21 +111,21 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
     }
 
 
-def from_R_to_im(x, y, window_size, stride, filter_size):
-    x = x * stride + (window_size - 1)//2 + (filter_size - 1)//2
-    y = y * stride + (window_size - 1)//2 + (filter_size - 1)//2
+def from_R_to_im(i, j, window_size, stride, filter_size):
+    i = i * stride + (window_size - 1) // 2 + (filter_size - 1) // 2
+    j = j * stride + (window_size - 1) // 2 + (filter_size - 1) // 2
 
-    return (x, y)
+    return (i, j)
 
 
-def R_to_heatmap(R, window_size, stride, im_size):
+def R_to_heatmap(R, window_size, stride, im_size, filter_size):
     R_size = R.shape[0]
     # create heatmap
     heatmap = np.zeros((im_size, im_size))
     for i in range(R_size):
         for j in range(R_size):
-            ix, iy = from_R_to_im(i, j, window_size, stride)
-            heatmap[ix:ix+window_size,
-                    iy:iy+window_size] = R[i, j]
+            ix, iy = from_R_to_im(i, j, window_size, stride, filter_size)
+            heatmap[ix:ix + window_size,
+                    iy:iy + window_size] = R[i, j]
     heatmap /= heatmap.max()
     return heatmap
