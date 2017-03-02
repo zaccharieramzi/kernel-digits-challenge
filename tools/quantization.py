@@ -126,11 +126,11 @@ def em_spherical(data, k, max_iter=10, verbose=True):
     '''
     q = np.empty((data.shape[0], k))
     pi = np.empty(k)
-    mu = np.empty((k, 2))
+    mu = np.empty((k, data.shape[1]))
     sigma = np.empty(k)
 
     # initialisation
-    [labels, centroids] = kmeans(data, k, verbose=verbose)
+    [centroids, labels] = kmeans(data, k, verbose=verbose)
     for c in range(len(centroids)):
         # mu is initialised with the centroid position
         mu[c, :] = data[labels == c].mean(axis=0)
