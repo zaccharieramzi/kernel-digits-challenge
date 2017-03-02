@@ -35,31 +35,10 @@ def gaussian_filter_2d(shape=(3, 3), sigma=0.25):
     return h
 
 
-def grad(im):
-    '''
-    compute the gradient of the input
-    Args :
-        - im ndarray image
-    return :
-        - gradient of the image (same size as the input) we use mirror padding
-        that is there are 0 at the borders
-    '''
-    fx = np.zeros_like(im)
-    fy = np.zeros_like(im)
-    fx[:-1, :] = im[1:, :] - im[:-1, :]
-    # fx[-1, :] = 0 redundant
-
-    fy[:, :-1] = im[:, 1:] - im[:, :-1]
-    # fy[:, -1] = 0 redundant
-    return fx, fy
-
-
-def difference_of_Gaussian_filters(shape=(5, 5), sigma=0.25):
+def difference_of_Gaussian_filters(shape=(5, 5), sigma=0.7):
     # we compute the filter only once
-    filterx, filtery = grad(gaussian_filter_2d(shape=shape, sigma=sigma))
-    # we crop to avoid border effects
-    filterx = filterx[1:-1, 1:-1]
-    filtery = filtery[1:-1, 1:-1]
+    filtery, filterx = np.gradient(
+        gaussian_filter_2d(shape=shape, sigma=sigma))
     return filterx, filtery
 
 

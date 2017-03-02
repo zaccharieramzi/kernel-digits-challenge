@@ -9,7 +9,7 @@ from .visualization import reshape_as_images, imshow
 
 
 def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
-                    filter_size=3, filter_sigma=0.25,
+                    filter_size=3, filter_sigma=0.7,
                     ratio_pins_per_image=25, data_type="train",
                     index_to_visualize=[], resized=False):
     # data loading
@@ -86,13 +86,22 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
                                    i+patch_size//2+patch_size % 2,
                                    j-patch_size//2:
                                    j+patch_size//2+patch_size % 2]
-            pin_as_matrix = discretize_orientation(patch_x, patch_y)
+            pin_as_matrix, w = discretize_orientation(patch_x, patch_y)
+            # separation into 4 sub histograms that are concatenanted into pins
             pin = np.empty(16 * 4)
-            pin[:16] = pin_as_vect(pin_as_matrix[:patch_size//2, :patch_size//2])
-            pin[16:32] = pin_as_vect(pin_as_matrix[patch_size//2:, :patch_size//2])
-            pin[32:48] = pin_as_vect(pin_as_matrix[:patch_size//2, patch_size//2:])
-            pin[48:] = pin_as_vect(pin_as_matrix[patch_size//2:, patch_size//2:])
-            pin = pin_as_vect(pin_as_matrix)
+            pin[:16] = pin_as_vect(
+                pin_as_matrix[:patch_size//2, :patch_size//2],
+                w[:patch_size//2, :patch_size//2])
+            pin[16:32] = pin_as_vect(
+                pin_as_matrix[patch_size//2:, :patch_size//2],
+                w[patch_size//2:, :patch_size//2])
+            pin[32:48] = pin_as_vect(
+                pin_as_matrix[:patch_size//2, patch_size//2:],
+                w[:patch_size//2, patch_size//2:])
+            pin[48:] = pin_as_vect(
+                pin_as_matrix[patch_size//2:, patch_size//2:],
+                w[patch_size//2:, patch_size//2:])
+
             pins.append(pin)  # pins is list of all pins for all images
             # for visualization purposes
             pin_to_im[len(pins)-1] = image_idx
