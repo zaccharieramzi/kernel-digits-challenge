@@ -105,11 +105,20 @@ def reshape_as_images(X):
     '''
     Reshape the data as a vector of images
     '''
-    n_images, img_len = X.shape
+    if X.ndim == 1:
+        n_images = 1
+        img_len = X.shape[0]
+    else:
+        n_images, img_len = X.shape
     img_size = int(sqrt(img_len // 3))
 
-    imgs = np.empty((n_images, img_size, img_size, 3), dtype=X.dtype)
     for c in range(3):
-        imgs[:, :, :, c] = X[:, 1024 * c:1024 * (c + 1)].reshape(
-            (n_images, img_size, img_size))
+        if X.ndim > 1:
+            imgs = np.empty((n_images, img_size, img_size, 3), dtype=X.dtype)
+            imgs[:, :, :, c] = X[:, 1024 * c:1024 * (c + 1)].reshape(
+                (n_images, img_size, img_size))
+        else:
+            imgs = np.empty((img_size, img_size, 3), dtype=X.dtype)
+            imgs[:, :, c] = X[1024 * c:1024 * (c + 1)].reshape(
+                (img_size, img_size))
     return imgs
