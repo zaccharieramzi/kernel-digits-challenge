@@ -25,6 +25,15 @@ def pred(X_train, X_pred, alpha, kernel_type="linear", **kwargs):
         X_pred = np.sqrt(X_pred)
         X_train = np.sqrt(X_train)
         K = X_pred.dot(X_train.T)
+    elif kernel_type == "polynomial":
+        try:
+            deg = kwargs["degree"]
+        except KeyError:
+            raise KeyError(
+                "You need a degree argument to compute a polynomial kernel")
+        else:
+            c = kwargs.get("constant", 0)
+            K = (X_pred.dot(X_train.T) + c)**deg
     else:
         K = np.zeros((n_pred, n_train))
         for i in range(n_pred):

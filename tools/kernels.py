@@ -16,13 +16,23 @@ def kernel(x, y, kernel_type="linear", **kwargs):
         return np.dot(x, y)
     elif kernel_type == "hellinger":
         return np.dot(np.sqrt(x), np.sqrt(y))
-    elif "rbf" in kernel_type:
+    elif kernel_type == "rbf":
         try:
             sigma = kwargs["sigma"]
         except KeyError:
             raise KeyError("You need a sigma argument to compute a Radial"
                            "Basis Function")
-        return np.exp(-np.linalg.norm(x - y)**2 / sigma ** 2)
+        else:
+            return np.exp(-np.linalg.norm(x - y)**2 / sigma ** 2)
+    elif kernel_type == "polynomial":
+        try:
+            deg = kwargs["degree"]
+        except KeyError:
+            raise KeyError(
+                "You need a degree argument to compute a polynomial kernel")
+        else:
+            c = kwargs.get("constant", 0)
+            return (np.dot(x, y) + c)**deg
     else:
         raise ValueError("The {} kernel is not implemented".format(
             kernel_type))
@@ -48,8 +58,18 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
         except KeyError:
             raise KeyError("You need a sigma argument to compute a Radial"
                            "Basis Function")
-        pairwise_dists = squareform(pdist(X, 'euclidean'))
-        return np.exp(-pairwise_dists ** 2 / sigma ** 2)
+        else:
+            pairwise_dists = squareform(pdist(X, 'euclidean'))
+            return np.exp(-pairwise_dists ** 2 / sigma ** 2)
+    elif kernel_type == "polynomial":
+        try:
+            deg = kwargs["degree"]
+        except KeyError:
+            raise KeyError(
+                "You need a degree argument to compute a polynomial kernel")
+        else:
+            c = kwargs.get("constant", 0)
+            return (X.dot(X.T) + c)**deg
     else:
         n_data = X.shape[0]
         K = np.zeros((n_data, n_data))
