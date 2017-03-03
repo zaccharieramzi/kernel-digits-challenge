@@ -96,10 +96,9 @@ def store_resized_images(type="train"):
                        if f[-4:] == ".png"]
 
         images = np.empty((len(images_path), 63, 63))
-        index = 0
         for im in images_path:
+            index = int(im.split('.')[0].split('/')[-1])
             images[index] = np.array(Im.open(im))
-            index += 1
 
     with h5py.File(os.path.join("data", type+"_resized.hdf5"), "w") as h5f:
         dset = h5f.create_dataset("images", data=images)
