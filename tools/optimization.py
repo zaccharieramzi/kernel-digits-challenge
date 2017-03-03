@@ -21,7 +21,7 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
                            linear regression")
         else:
             n = len(Y)
-            return np.linalg.solve((K + lamb*n*np.eye(n)), Y)
+            return np.linalg.solve((K + lamb * n * np.eye(n)), Y)
     elif prob_type == "logistic regression":
         try:
             lamb = kwargs["lamb"]
@@ -36,15 +36,15 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
                                logistic regression")
             else:
                 n = len(Y)
-                Y = 2*Y - 1
+                Y = 2 * Y - 1
                 alpha = np.zeros(n)
                 W = np.eye(n)
                 z = np.zeros(n)
                 for iter in range(n_iter):
                     alpha = solveWKRR(K, W, z, lamb, n)
                     m = K.dot(alpha)
-                    W = np.diag(sigma(m)*sigma(-m))
-                    z = m + Y/sigma(-Y*m)
+                    W = np.diag(sigma(m) * sigma(-m))
+                    z = m + Y / sigma(-Y * m)
                 return alpha
     elif prob_type == "svm":
         try:
@@ -67,21 +67,75 @@ def svm(K, Y, lamb, n_iter=10000):
             - n_iter (int): the number of iterations for the coordinate
             descent.
     '''
-    Y_svm = 2*Y - 1
+    Y_svm = 2 * Y - 1
     n = K.shape[0]
     alpha = np.zeros(n)
-    alpha_new = np.ones(n)
     for i in range(n_iter):
-        alpha_new = alpha
         j = randint(0, n - 1)
-        beta = (Y_svm[j] + K[j, j]*alpha[j] - np.dot(alpha, K[:, j])) / K[j, j]
+        beta = Y_svm[j] + K[j, j] * alpha[j] - np.dot(alpha, K[:, j])
+        beta /= K[j, j]
         if Y_svm[j] * beta < 0:
-            alpha_new[j] = 0
-        elif Y_svm[j] * beta < 1 / (2*lamb*n):
-            alpha_new[j] = beta
+            alpha[j] = 0
+        elif Y_svm[j] * beta < 1 / (2 * lamb * n):
+            alpha[j] = beta
         else:
-            alpha_new[j] = Y_svm[j] / (2*lamb*n)
-    return alpha_new
+            alpha[j] = Y_svm[j] / (2 * lamb * n)
+    return alpha
+
+
+def svm_intercept(K, Y, lamb, n_iter=10000):
+    '''Solving the SVM with intercept quadratic problem with a coordinate
+    descent.
+        Args:
+            - K (ndarray): the kernel matrix of the observations.
+            - Y (ndarray): the labels of the observations.
+            - lamb (float): the regularization parameter.
+            - n_iter (int): the number of iterations for the coordinate
+            descent.
+    '''
+    Y_svm = 2 * Y - 1
+    n = K.shape[0]
+    alpha = np.zeros(n)
+    for t in range(n_iter):
+        j = randint(0, n - 1)
+        i = randint(0, n - 1)
+        while i == j:
+            i = randint(0, n - 1)
+        if Y_svm[i] * Y_svm[j] == -1:
+            if Y_svm[i] == -1:
+                # We switch the variables in order to have less cases
+                temp = i
+                i = j
+                j = temp
+        alpha_sum_w_ij = np.sum(alpha) - alpha[i] - alpha[j]
+        alpha_bound = 1 / (2 * lamb * n)
+        beta = alpha_sum_w_ij
+        beta *= K[i, j] - K[j, j]
+        beta += Y_svm[i] - Y_svm[j]
+        beta /= K[i, i] + K[j, j] - 2 * K[i, j]
+        if Y[i] == 1 and Y[j] == 1:
+            if beta < max(0, -(alpha_sum_w_ij + alpha_bound)):
+                alpha[i] = max(0, -(alpha_sum_w_ij + alpha_bound))
+            elif beta < min(alpha_bound, -alpha_sum_w_ij):
+                alpha[i] = beta
+            else:
+                alpha[i] = min(alpha_bound, -alpha_sum_w_ij)
+        elif Y[i] == -1 and Y[j] == -1:
+            if beta < max(-alpha_bound, -alpha_sum_w_ij):
+                alpha[i] = max(-alpha_bound, -alpha_sum_w_ij)
+            elif beta < min(0, alpha_bound - alpha_sum_w_ij):
+                alpha[i] = beta
+            else:
+                alpha[i] = min(0, alpha_bound - alpha_sum_w_ij)
+        else:
+            if beta < max(0, -alpha_sum_w_ij):
+                alpha[i] = max(0, -alpha_sum_w_ij)
+            elif beta < min(alpha_bound, alpha_bound - alpha_sum_w_ij):
+                alpha[i] = beta
+            else:
+                alpha[i] = min(alpha_bound, alpha_bound - alpha_sum_w_ij)
+        alpha[j] = - alpha[i] - alpha_sum_w_ij
+    return alpha
 
 
 def sigma(X):
@@ -93,7 +147,7 @@ def sigma(X):
     Returns :
              - the sigmoid of the vector ndarray (., 1)
     '''
-    return 1/(1+np.exp(-X))
+    return 1 / (1 + np.exp(-X))
 
 
 def solveWKRR(K, W, z, lamb, n):
@@ -109,6 +163,6 @@ def solveWKRR(K, W, z, lamb, n):
              - the solution alpha at each step
     '''
     W_sqrt = np.sqrt(W)
-    I = lamb*n*np.eye(n)
+    I = lamb * n * np.eye(n)
     return W_sqrt.dot(np.linalg.solve((W_sqrt.dot(K).dot(W_sqrt) + I),
                                       W_sqrt.dot(z)))
