@@ -138,6 +138,7 @@ def fast_svm(K, Y, lamb, n_iter=10000):
     return alpha
 
 
+
 def svm_intercept(K, Y, lamb, n_iter=10000):
     '''Solving the SVM with intercept quadratic problem with a coordinate
     descent.
