@@ -81,7 +81,7 @@ def svm(K, Y, lamb, n_iter=10000):
             alpha[j] = beta
         else:
             alpha[j] = Y_svm[j] / (2 * lamb * n)
-        obj_func[i] = 2 * np.dot(Y, alpha) - np.dot(alpha, np.dot(K, alpha))
+        obj_func[i] = 2 * np.dot(Y_svm, alpha) - np.dot(alpha, np.dot(K, alpha))
     return alpha, obj_func
 
 
