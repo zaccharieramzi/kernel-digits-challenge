@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import cdist
 
 from tools.kernels import kernel
 
@@ -34,6 +35,15 @@ def pred(X_train, X_pred, alpha, kernel_type="linear", **kwargs):
         else:
             c = kwargs.get("constant", 0)
             K = (X_pred.dot(X_train.T) + c)**deg
+    elif kernel_type == "rbf":
+        try:
+            sigma = kwargs["sigma"]
+        except KeyError:
+            raise KeyError("You need a sigma argument to compute a Radial"
+                           "Basis Function")
+        else:
+            pairwise_dists = cdist(X_pred, X_train, 'euclidean')
+            return np.exp(-pairwise_dists ** 2 / sigma ** 2)
     else:
         K = np.zeros((n_pred, n_train))
         for i in range(n_pred):
