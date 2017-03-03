@@ -70,6 +70,7 @@ def svm(K, Y, lamb, n_iter=10000):
     Y_svm = 2 * Y - 1
     n = K.shape[0]
     alpha = np.zeros(n)
+    obj_func = np.zeros(n_iter)
     for i in range(n_iter):
         j = randint(0, n - 1)
         beta = Y_svm[j] + K[j, j] * alpha[j] - np.dot(alpha, K[:, j])
@@ -80,7 +81,8 @@ def svm(K, Y, lamb, n_iter=10000):
             alpha[j] = beta
         else:
             alpha[j] = Y_svm[j] / (2 * lamb * n)
-    return alpha
+        obj_func[i] = 2 * np.dot(Y, alpha) - np.dot(alpha, np.dot(K, alpha))
+    return alpha, obj_func
 
 
 def svm_intercept(K, Y, lamb, n_iter=10000):
