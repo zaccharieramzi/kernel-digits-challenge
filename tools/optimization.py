@@ -54,6 +54,15 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
         else:
             n_iter = kwargs.get("n_iter", 10000)
             return svm(K, Y, lamb, n_iter)
+    elif prob_type == "fast_svm":
+        try:
+            lamb = kwargs["lamb"]
+        except KeyError:
+            raise KeyError(
+                "You need a lamb argument when performing a fast_svm")
+        else:
+            n_iter = kwargs.get("n_iter", 10000)
+            return fast_svm(K, Y, lamb, n_iter)
     else:
         raise ValueError("{} is not implemented.".format(prob_type))
 
@@ -70,7 +79,6 @@ def svm(K, Y, lamb, n_iter=10000):
     Y_svm = 2 * Y - 1
     n = K.shape[0]
     alpha = np.zeros(n)
-    obj_func = np.zeros(n_iter)
     for i in range(n_iter):
         j = randint(0, n - 1)
         beta = Y_svm[j] + K[j, j] * alpha[j] - np.dot(alpha, K[:, j])
@@ -81,8 +89,53 @@ def svm(K, Y, lamb, n_iter=10000):
             alpha[j] = beta
         else:
             alpha[j] = Y_svm[j] / (2 * lamb * n)
-        obj_func[i] = 2 * np.dot(Y_svm, alpha) - np.dot(alpha, np.dot(K, alpha))
-    return alpha, obj_func
+    return alpha
+
+
+def fast_svm(K, Y, lamb, n_iter=10000):
+    '''Solving the SVM quadratic problem with a double coordinate descent.
+        Args:
+            - K (ndarray): the kernel matrix of the observations.
+            - Y (ndarray): the labels of the observations.
+            - lamb (float): the regularization parameter.
+            - n_iter (int): the number of iterations for the coordinate
+            descent.
+    '''
+    Y_svm = 2 * Y - 1
+    n = K.shape[0]
+    alpha = np.zeros(n)
+    for t in range(n_iter):
+        j = randint(0, n - 1)
+        i = randint(0, n - 1)
+        while i == j:
+            i = randint(0, n - 1)
+
+        a_i = Y_svm[i] - np.dot(alpha, K[:, i])
+        a_i += alpha[i] * K[i, i] + alpha[j] * K[j, i]
+        a_j = Y_svm[j] - np.dot(alpha, K[:, j])
+        a_j += alpha[i] * K[i, j] + alpha[j] * K[j, j]
+        a = np.array([a_i, a_j])
+        K_sub = np.array([
+            [K[i, i], K[i, j]],
+            [K[i, j], K[j, j]]
+        ])
+        cand_alph_i, cand_alph_j = np.linalg.solve(K_sub, a)
+        # Update for i coordinate: we project the candidate on the
+        # restrictions.
+        if Y_svm[i] * cand_alph_i < 0:
+            alpha[i] = 0
+        elif Y_svm[i] * cand_alph_i < 1 / (2 * lamb * n):
+            alpha[i] = cand_alph_i
+        else:
+            alpha[i] = Y_svm[i] / (2 * lamb * n)
+        # Update for j coordinate.
+        if Y_svm[j] * cand_alph_j < 0:
+            alpha[j] = 0
+        elif Y_svm[j] * cand_alph_j < 1 / (2 * lamb * n):
+            alpha[j] = cand_alph_j
+        else:
+            alpha[j] = Y_svm[j] / (2 * lamb * n)
+    return alpha
 
 
 def svm_intercept(K, Y, lamb, n_iter=10000):
