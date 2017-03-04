@@ -48,7 +48,8 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
             - ndarray: the kernel matrix.
     '''
     if kernel_type == "linear":
-        return X.dot(X.T)
+        inner = kwargs.get("inner", X.dot(X.T))
+        return inner
     elif kernel_type == "hellinger":
         X = np.sqrt(X)
         return X.dot(X.T)
@@ -59,8 +60,9 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
             raise KeyError("You need a sigma argument to compute a Radial"
                            "Basis Function")
         else:
-            pairwise_dists = squareform(pdist(X, 'euclidean'))
-            return np.exp(-pairwise_dists ** 2 / sigma ** 2)
+            pairwise_dists = kwargs.get(
+                "dist", squareform(pdist(X, 'euclidean')))
+            return np.exp(-pairwise_dists ** 2 / (2 * sigma ** 2))
     elif kernel_type == "polynomial":
         try:
             deg = kwargs["degree"]
@@ -69,7 +71,8 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
                 "You need a degree argument to compute a polynomial kernel")
         else:
             c = kwargs.get("constant", 0)
-            return (X.dot(X.T) + c)**deg
+            inner = kwargs.get("inner", X.dot(X.T))
+            return (inner + c)**deg
     else:
         n_data = X.shape[0]
         K = np.zeros((n_data, n_data))
