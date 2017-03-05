@@ -83,7 +83,5 @@ def convolve(image_mat, filterx, filtery):
             image_grad_y[i, j] = np.sum(
                 image_mat[rmin:rmax, smin:smax] * filtery[rmin_f:rmax_f,
                                                           smin_f:smax_f])
-    # let's crop to avoid border effect
-    image_grad_x = image_grad_x[1:-1, 1:-1]
-    image_grad_y = image_grad_y[1:-1, 1:-1]
+
     return image_grad_x, image_grad_y
