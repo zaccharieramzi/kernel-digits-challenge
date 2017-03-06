@@ -9,6 +9,27 @@ def hog(
         image,
         filter_sigma=0.1, filter_shape=5, hog_cell_size=8, disc_grid=16,
         normalize=False, block_size=2, color_grad=False):
+    '''Computes histogram of gradients for a given image.
+    Args:
+        - image (ndarray): image (im_size x im_size x 3) whose HoG you want.
+        - filter_sigma (float): the gaussian filter sigma.
+        - filter_shape (odd int): the size of the gaussian gradient you want to
+        compute.
+        - hog_cell_size (int divisor of im_size): the size of the cells in
+        which you want to have a histogram.
+        - disc_grid (even int): pi/disc_grid will be the angle for
+        discretization of the gradients' orientations.
+        - normalize (bool): whether you want to normalize the histograms per
+        block.
+        - block_size (int): the square root of the number of cells in each
+        normalization block.
+        - color_grad (bool): whether you want to take into acocunt all the
+        colors when computing the gradients. The gradient retained will be the
+        one with biggest norm.
+    Returns:
+        - ndarray: ((im_size/hog_cell_size)**2 x disc_grid/2), the histograms
+        of gradients flattened.
+    '''
     im_size = image.shape[0]  # 32 or 63
     # gaussian filters
     filterx, filtery = difference_of_Gaussian_filters(
@@ -23,11 +44,13 @@ def hog(
         image_grad_y = np.zeros((n_colors, im_size**2))
 
         for c in range(n_colors):
+            # we compute the gradient for each color
             grad_x, grad_y = convolve(image[:, :, c], filterx, filtery)
             image_grad_x[c, :] = grad_x.reshape((im_size**2,))
             image_grad_y[c, :] = grad_y.reshape((im_size**2,))
 
         image_grad_n = np.sqrt(image_grad_x**2 + image_grad_y**2)
+        # we select only the biggest gradient thanks to some numpy magic.
         best_colors = np.argmax(image_grad_n, axis=0)
         image_grad_x = image_grad_x[
             best_colors, np.arange(im_size**2)].reshape((im_size, im_size))
@@ -42,6 +65,7 @@ def hog(
         signed=False,
         disc_grid=16)
     n_cells = im_size // hog_cell_size
+    # we compte in each cell the histogram of gradient
     cells_vector = np.zeros((n_cells, n_cells, disc_grid // 2))
     for i in range(n_cells):
         for j in range(n_cells):
