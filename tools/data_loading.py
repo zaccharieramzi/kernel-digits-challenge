@@ -1,7 +1,9 @@
+import os
+
 import numpy as np
 import h5py
 import PIL.Image as Im
-import os
+
 
 def load_labels():
     '''
@@ -20,7 +22,7 @@ def dummy_code(Y):
            - ndarray (., n_classes) labels dummy coded
     '''
     n = Y.shape[0]
-    Y_dum = np.zeros((n, int(Y.max())+1))
+    Y_dum = np.zeros((n, int(Y.max()) + 1))
     Y_dum[np.arange(n), Y.astype('uint8')] = 1
     return Y_dum
 
@@ -100,6 +102,6 @@ def store_resized_images(type="train"):
             index = int(im.split('.')[0].split('/')[-1])
             images[index] = np.array(Im.open(im))
 
-    with h5py.File(os.path.join("data", type+"_resized.hdf5"), "w") as h5f:
+    with h5py.File(os.path.join("data", type + "_resized.hdf5"), "w") as h5f:
         dset = h5f.create_dataset("images", data=images)
         h5f.flush()
