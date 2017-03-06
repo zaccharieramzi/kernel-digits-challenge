@@ -48,7 +48,7 @@ def dump_as_png(type='test', number=None):
     if type == 'train':
         # we create a directory per label
         subdirs = []
-        for i in range(int(Y.max()+1)):
+        for i in range(int(Y.max() + 1)):
             subdir = os.path.join(dir_path, str(i))
             subdirs.append(subdir)
             if not os.path.isdir(subdir):
