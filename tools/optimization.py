@@ -8,7 +8,9 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
     Args :
            - K ndarray (., .): the kernel matrix
            - Y ndarray (.,): the labels (0 or 1)
-           - prob_type: which type of classification problem you want to solve
+           - prob_type: which type of classification problem you want to solve.
+           Available are: linear regression, logistic regression, svm,
+           fast_svm.
            - **kwargs: arguments to be passed to the optimization solver
     Returns :
              - alpha
@@ -74,6 +76,7 @@ def svm(K, Y, weights, lamb, n_iter=10000):
         Args:
             - K (ndarray): the kernel matrix of the observations.
             - Y (ndarray): the labels of the observations.
+            - weights (ndarray): the weights for each observation.
             - lamb (float): the regularization parameter.
             - n_iter (int): the number of iterations for the coordinate
             descent.
@@ -99,6 +102,7 @@ def fast_svm(K, Y, weights, lamb, n_iter=10000):
         Args:
             - K (ndarray): the kernel matrix of the observations.
             - Y (ndarray): the labels of the observations.
+            - weights (ndarray): the weights for each observation.
             - lamb (float): the regularization parameter.
             - n_iter (int): the number of iterations for the coordinate
             descent.
