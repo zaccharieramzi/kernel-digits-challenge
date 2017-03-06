@@ -36,6 +36,13 @@ def gaussian_filter_2d(shape=(3, 3), sigma=0.25):
 
 
 def difference_of_Gaussian_filters(shape=(5, 5), sigma=0.7):
+    '''Computes a gaussian gradient in x and one in y.
+    Args:
+        - shape ((odd int, odd int)): the shape of the gaussian gradients.
+        - sigma (float): the sigma of the gaussian.
+    Output:
+        - ndarray, ndarray: the gaussian gradient filters in x and y.
+    '''
     # we compute the filter only once
     filtery, filterx = np.gradient(
         gaussian_filter_2d(shape=shape, sigma=sigma))
