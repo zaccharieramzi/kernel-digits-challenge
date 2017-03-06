@@ -12,6 +12,9 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
                     filter_size=3, filter_sigma=0.7,
                     ratio_pins_per_image=25, data_type="train",
                     index_to_visualize=[], resized=False):
+    '''Computes the pins for each image. This function is legacy therefore not
+    documented.
+    '''
     # data loading
     if not resized:
         X = load_images(type=data_type)
@@ -116,6 +119,9 @@ def pins_generation(training_idx=[], window_size=5, stride=3, patch_size=5,
 
 
 def from_R_to_im(x, y, window_size, stride, filter_size):
+    '''From positions in the corner response function matrix, gives position in
+    the image. This function is legacy therefore not documented.
+    '''
     x = x * stride + (window_size - 1)//2 + (filter_size - 1)//2
     y = y * stride + (window_size - 1)//2 + (filter_size - 1)//2
 
@@ -123,6 +129,9 @@ def from_R_to_im(x, y, window_size, stride, filter_size):
 
 
 def R_to_heatmap(R, window_size, stride, im_size, filter_size):
+    '''Creates a heatmap at image size for a given corner response function
+    matrix. This function is legacy therefore not documented.
+    '''
     R_size = R.shape[0]
     # create heatmap
     heatmap = np.zeros((im_size, im_size))
