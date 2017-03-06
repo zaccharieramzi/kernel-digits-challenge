@@ -16,7 +16,7 @@ def labels_to_csv(Y, kernel="linear", algo="linear regression", user="Zac",
             - file_name (str): overwrites the file name.
     '''
     df_labels = pd.DataFrame(data=Y,
-                             index=np.arange(len(Y))+1,
+                             index=np.arange(len(Y)) + 1,
                              columns=["Prediction"])
     df_labels.index.names = ["Id"]
     if file_name is None:
