@@ -8,21 +8,40 @@ from .discretization import discretize_orientation, pin_as_vect
 def hog(
         image,
         filter_sigma=0.1, filter_shape=5, hog_cell_size=8, disc_grid=16,
-        normalize=False, block_size=2):
-    X = image.mean(axis=2)
-    image_size = X.shape[0]  # 32 or 63
+        normalize=False, block_size=2, color_grad=False):
+    im_size = image.shape[0]  # 32 or 63
     # gaussian filters
     filterx, filtery = difference_of_Gaussian_filters(
         shape=(filter_shape, filter_shape),
         sigma=filter_sigma)
-    image_grad_x, image_grad_y = convolve(X, filterx, filtery)
+    if color_grad:
+        n_colors = image.shape[2]
+        # image_grad_x represents the gaussian gradient of the image in x for
+        # all three colors. However, for each the color, the gradient is
+        # represented as a line to compute the best for each color.
+        image_grad_x = np.zeros((n_colors, im_size**2))
+        image_grad_y = np.zeros((n_colors, im_size**2))
 
+        for c in range(n_colors):
+            grad_x, grad_y = convolve(image[:, :, c], filterx, filtery)
+            image_grad_x[c, :] = grad_x.reshape((im_size**2,))
+            image_grad_y[c, :] = grad_y.reshape((im_size**2,))
+
+        image_grad_n = np.sqrt(image_grad_x**2 + image_grad_y**2)
+        best_colors = np.argmax(image_grad_n, axis=0)
+        image_grad_x = image_grad_x[
+            best_colors, np.arange(im_size**2)].reshape((im_size, im_size))
+        image_grad_y = image_grad_y[
+            best_colors, np.arange(im_size**2)].reshape((im_size, im_size))
+    else:
+        X = image.mean(axis=2)
+        image_grad_x, image_grad_y = convolve(X, filterx, filtery)
     ori, w = discretize_orientation(
         image_grad_x,
         image_grad_y,
         signed=False,
         disc_grid=16)
-    n_cells = image_size // hog_cell_size
+    n_cells = im_size // hog_cell_size
     cells_vector = np.zeros((n_cells, n_cells, disc_grid // 2))
     for i in range(n_cells):
         for j in range(n_cells):
