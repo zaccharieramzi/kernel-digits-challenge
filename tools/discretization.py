@@ -13,7 +13,7 @@ def discretize_orientation(patch_x, patch_y, signed=True, disc_grid=16):
         0 and 15*pi/8
     '''
     orientation = np.arctan2(patch_y, patch_x)
-    discrete_or = np.round((disc_grid//2)*orientation / np.pi)
+    discrete_or = np.round((disc_grid // 2) * orientation / np.pi)
     if not signed:
         discrete_or[discrete_or < 0] = discrete_or[discrete_or < 0] + 8
         discrete_or[discrete_or == 8] = 0
@@ -30,7 +30,7 @@ def pin_as_vect(discrete_or, weights, disc_grid=16):
     return
         - vect: pin as a vector counting orientation occurences
     '''
-    vect = np.zeros(disc_grid//2)
+    vect = np.zeros(disc_grid // 2)
     for i, row in enumerate(discrete_or):
         for j, el in enumerate(row):
             if el >= 0:
