@@ -7,7 +7,8 @@ def kernel(x, y, kernel_type="linear", **kwargs):
     Args :
            - x ndarray (., d): sample image.
            - y ndarray (., d): sample image.
-           - kernel_type string: which type of kernel you want to derive.
+           - kernel_type (str): which type of kernel you want to derive.
+           Available are: linear, hellinger, rbf, polynomial.
            - **kwargs: arguments to be passed on to a specific kernel type.
     Returns :
              - float: the value of k(x,y)
@@ -43,6 +44,7 @@ def kernel_matrix(X, kernel_type="linear", **kwargs):
         Arguments:
             - X (ndarray): the input data.
             - kernel_type (str): the type of kernel you want to use.
+            Available are: linear, hellinger, rbf, polynomial.
             - **kwargs: arguments to be passed on to a specific kernel type.
         Returns:
             - ndarray: the kernel matrix.
