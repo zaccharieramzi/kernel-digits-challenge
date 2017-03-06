@@ -15,6 +15,9 @@ To then activate it you just need to do:
 ```shell
 source venv/bin/actvate
 ```
+## Data
+You need to download the data from the Kaggle challenge and put it in a folder
+named data at the root of the directory.
 
 # Use
 ## Big image generation
@@ -33,3 +36,5 @@ Don't forget to activate tqdm notebook extensions if you want a nice experience.
 ```shell
 jupyter nbextension enable --py widgetsnbextension
 ```
+## Submissions
+Your submissions will end up in the submission folder.
