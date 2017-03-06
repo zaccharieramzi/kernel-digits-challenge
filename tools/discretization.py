@@ -4,13 +4,15 @@ import numpy as np
 def discretize_orientation(patch_x, patch_y, signed=True, disc_grid=16):
     '''
     args :
-        - patch_x: gradient in x of the patch in (x, y)
-        - patch_y: gradient in y of the patch in (x, y)
-        - signed (bool): we take care of the sense(True) or direction(False)
-        disc_grid: number of orientations desired
-    return
-        - discrete_or: an array containing the orientation discretized between
-        0 and 15*pi/8
+        - patch_x (ndarray): gradient in x of the patch in (x, y)
+        - patch_y (ndarray): gradient in y of the patch in (x, y)
+        - signed (bool): we take care of the sense (True) or direction (False)
+        - disc_grid (even int): pi/disc_grid will be the angle for
+        discretization of the gradients' orientations.
+    returns :
+        - ndarray: contains the orientations of each gradient discretized.
+        - ndarray: contains the norm of each gradient.
+
     '''
     orientation = np.arctan2(patch_y, patch_x)
     discrete_or = np.round((disc_grid // 2) * orientation / np.pi)
@@ -23,12 +25,12 @@ def discretize_orientation(patch_x, patch_y, signed=True, disc_grid=16):
 
 def pin_as_vect(discrete_or, weights, disc_grid=16):
     '''
-    Converting the orientation matrix to a pin (to be used in kmeans)
+    Converting the orientation matrix to a histogram.
     args :
-        - discrete_or: pin as a matrix patch_size*patch_size
-        - weights: a matrix containing the length of each vector
-    return
-        - vect: pin as a vector counting orientation occurences
+        - discrete_or (ndarray): discretized gradient orientation.
+        - weights (ndarray): a matrix containing the norm of each gradient
+    returns :
+        - ndarray: weighted historam of gradients.
     '''
     vect = np.zeros(disc_grid // 2)
     for i, row in enumerate(discrete_or):
