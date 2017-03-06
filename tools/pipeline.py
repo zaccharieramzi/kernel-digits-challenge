@@ -1,13 +1,13 @@
 import numpy as np
 
 from .data_loading import load_images, load_labels, dummy_code
+from .feature_learning import pins_generation
 from .kernels import kernel_matrix
 from .optimization import find_f
 from .prediction import pred
 from .process_images import process_images
 from .quantization import kmeans
 from .submission import labels_to_csv
-from .visualization import imshow, dump_as_png
 
 # Data loading
 X_train = load_images(type="train")
@@ -17,7 +17,7 @@ Y_train = dummy_code(Y_labels_train)
 n_classes = Y_train.shape[1]
 
 indices = np.random.permutation(X_train.shape[0])
-training_idx, test_idx = indices[:int(0.9*n_train)], indices[int(0.9*n_train):]
+training_idx, test_idx = indices[:int(0.9 * n_train)], indices[int(0.9 * n_train):]
 
 # data exploration:
 # - find a way to visualize images
