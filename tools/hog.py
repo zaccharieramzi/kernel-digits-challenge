@@ -15,7 +15,7 @@ def hog(
         - filter_sigma (float): the gaussian filter sigma.
         - filter_shape (odd int): the size of the gaussian gradient you want to
         compute.
-        - hog_cell_size (int divisor of im_size): the size of the cells in
+        - hog_cell_size (int): the size of the cells in
         which you want to have a histogram.
         - disc_grid (even int): pi/disc_grid will be the angle for
         discretization of the gradients' orientations.
