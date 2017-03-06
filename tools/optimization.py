@@ -53,7 +53,8 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
             raise KeyError("You need a lamb argument when performing an svm")
         else:
             n_iter = kwargs.get("n_iter", 10000)
-            return svm(K, Y, lamb, n_iter)
+            weights = kwargs.get("weights", np.ones(len(Y)))
+            return svm(K, Y, weights, lamb, n_iter)
     elif prob_type == "fast_svm":
         try:
             lamb = kwargs["lamb"]
@@ -62,12 +63,13 @@ def find_f(K, Y, prob_type="linear regression", **kwargs):
                 "You need a lamb argument when performing a fast_svm")
         else:
             n_iter = kwargs.get("n_iter", 10000)
-            return fast_svm(K, Y, lamb, n_iter)
+            weights = kwargs.get("weights", np.ones(len(Y)))
+            return fast_svm(K, Y, weights, lamb, n_iter)
     else:
         raise ValueError("{} is not implemented.".format(prob_type))
 
 
-def svm(K, Y, lamb, n_iter=10000):
+def svm(K, Y, weights, lamb, n_iter=10000):
     '''Solving the SVM quadratic problem with a coordinate descent.
         Args:
             - K (ndarray): the kernel matrix of the observations.
@@ -85,14 +87,14 @@ def svm(K, Y, lamb, n_iter=10000):
         beta /= K[j, j]
         if Y_svm[j] * beta < 0:
             alpha[j] = 0
-        elif Y_svm[j] * beta < 1 / (2 * lamb * n):
+        elif Y_svm[j] * beta < weights[j] / (2 * lamb * n):
             alpha[j] = beta
         else:
-            alpha[j] = Y_svm[j] / (2 * lamb * n)
+            alpha[j] = Y_svm[j] * weights[j] / (2 * lamb * n)
     return alpha
 
 
-def fast_svm(K, Y, lamb, n_iter=10000):
+def fast_svm(K, Y, weights, lamb, n_iter=10000):
     '''Solving the SVM quadratic problem with a double coordinate descent.
         Args:
             - K (ndarray): the kernel matrix of the observations.
@@ -124,17 +126,17 @@ def fast_svm(K, Y, lamb, n_iter=10000):
         # restrictions.
         if Y_svm[i] * cand_alph_i < 0:
             alpha[i] = 0
-        elif Y_svm[i] * cand_alph_i < 1 / (2 * lamb * n):
+        elif Y_svm[i] * cand_alph_i < weights[i] / (2 * lamb * n):
             alpha[i] = cand_alph_i
         else:
-            alpha[i] = Y_svm[i] / (2 * lamb * n)
+            alpha[i] = Y_svm[i] * weights[i] / (2 * lamb * n)
         # Update for j coordinate.
         if Y_svm[j] * cand_alph_j < 0:
             alpha[j] = 0
-        elif Y_svm[j] * cand_alph_j < 1 / (2 * lamb * n):
+        elif Y_svm[j] * cand_alph_j < weights[j] / (2 * lamb * n):
             alpha[j] = cand_alph_j
         else:
-            alpha[j] = Y_svm[j] / (2 * lamb * n)
+            alpha[j] = Y_svm[j] * weights[j] / (2 * lamb * n)
     return alpha
 
 
