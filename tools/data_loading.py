@@ -36,8 +36,16 @@ def load_images(type="train"):
     '''
     if type == "train":
         path = 'data/Xtr.csv'
+        image_size = 3072  # 32*32*3
     elif type == "test":
         path = 'data/Xte.csv'
+        image_size = 3072
+    elif type == "train63":
+        path = 'data/Xtr63.csv'
+        image_size = 11907  # 63*63*3
+    elif type == "test63":
+        path = 'data/Xte63.csv'
+        image_size = 11907
     else:
         raise ValueError("type {} unknown, it should be either"
                          "'train' or 'test'".format(type))
