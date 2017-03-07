@@ -1,5 +1,5 @@
 # Requirements
-You need python3.5 to run this project as well as Matlab.
+You need python3.5 to run this project as well as Matlab R2016b.
 ## Lib installation
 All the python libraries you need are listed in `requirements.txt`. To install
 them conveniently you can do the following:
@@ -21,7 +21,9 @@ named data at the root of the directory.
 
 # Use
 ## Big image generation
-
+We used Matlab to generate larger images. To do so run `zoom.m` and
+`zoom_test.m` in the folder matlab_preprocessing. It will generate to `.csv`
+files that you can load easily with the built functions. 
 ## Easy script
 
 ## Notebooks
