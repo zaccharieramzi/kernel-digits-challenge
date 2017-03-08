@@ -41,11 +41,17 @@ def load_images(type="train"):
         path = 'data/Xte.csv'
         image_size = 3072
     elif type == "train63":
-        path = 'data/Xtr63.csv'
-        image_size = 11907  # 63*63*3
-    elif type == "test63":
-        path = 'data/Xte63.csv'
         image_size = 11907
+        return np.loadtxt(
+            "data/Xtr63.csv",
+            delimiter=',',
+            usecols=range(image_size))
+    elif type == "test63":
+        image_size = 11907
+        return np.loadtxt(
+            "data/Xte63.csv",
+            delimiter=',',
+            usecols=range(image_size))
     else:
         raise ValueError("type {} unknown, it should be either"
                          "'train' or 'test'".format(type))

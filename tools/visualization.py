@@ -75,7 +75,7 @@ def imshow(x, points_of_interest=None, heatmap=None):
     if len(x.shape) == 1:
         img = np.empty((img_size, img_size, 3))
         for c in range(3):
-            img[:, :, c] = x[1024 * c:1024 * (c + 1)].reshape(
+            img[:, :, c] = x[img_size**2 * c:img_size**2 * (c + 1)].reshape(
                 (img_size, img_size))
 
     else:
@@ -110,6 +110,6 @@ def reshape_as_images(X):
 
     imgs = np.empty((n_images, img_size, img_size, 3), dtype=X.dtype)
     for c in range(3):
-        imgs[:, :, :, c] = X[:, 1024 * c:1024 * (c + 1)].reshape(
+        imgs[:, :, :, c] = X[:, img_size**2 * c:img_size**2 * (c + 1)].reshape(
             (n_images, img_size, img_size))
     return imgs
