@@ -1,0 +1,21 @@
+function [idx,fail] = order(y);
+%% Zoom d'une image 
+
+G = zeros(5000,63*63*3);
+M = dlmread(string('../data/Xtr.csv'));
+M = M(:,1:end-1);
+N = zeros(5000,32,32,3);
+
+%%
+for c = 1:3
+    N(:,:,:,c) = reshape(M(:,32*32*(c-1)+1:32*32*(c)),[5000,32,32]);
+end
+%M = reshape(M,[5000,32,32,3]);
+%%
+for i=1:5000
+    image = squeeze(N(1,:,:,:));
+    image = image - min(image(:));
+    image = permute(image,[2 1 3]);
+    N(i,:,:,:) = uint8((image / max(image(:)))*255);
+end
+
