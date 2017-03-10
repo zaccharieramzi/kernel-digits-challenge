@@ -6,9 +6,4 @@ x=fixedLogs4sortIt(y);
 [tmp,idx]=sort(x(:),'ascend');
 tmp=diff(tmp);fail=length(find(tmp==0));
 
-disp(['   fail=',num2str(100*fail/numel(y)),' % pixels']);
-
-
-
-
-
+% disp(['   fail=',num2str(100*fail/numel(y)),' % pixels']);
