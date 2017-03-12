@@ -21,16 +21,17 @@ named data at the root of the directory.
 
 # Use
 ## Easy script
-You can run the whole pipeline by calling `python easy_script.py`.
+You can run the whole pipeline by calling `python easy_script.py`. The result is written in the file `submissions/Yte.csv`.
+
 Make sure that **matlab** is in your PATH ! This scripts call the two parts outlined below :
 ### Big image generation
 We used Matlab to generate larger images. To do so run `zoom_color.m` and
 `zoom_test_color.m` in the folder *matlab_preprocessing*. It will generate to `.csv`
-files that you can load easily with the built functions. 
+files that you can load easily with the built-in functions. 
 ### Feature computation and classification
 To compute HOG features and run the SVM classifier you can run `pipeline.py`
 
-## Notebooks
+## Notebooks (details of the experiments)
 The main notebooks (*gradient_viz*, *grid_search_color* and *grid_search*) are
 relatively easy to use and pretty self forward. To open Jupyter, do the
 following:
